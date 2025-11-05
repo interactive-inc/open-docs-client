@@ -21,7 +21,7 @@
     },
     "packages/docs": {
       "name": "@interactive-inc/docs",
-      "version": "1.0.13",
+      "version": "1.0.14",
       "bin": {
         "docs": "bin/docs.js",
       },
@@ -35,7 +35,7 @@
     },
     "packages/docs-client": {
       "name": "@interactive-inc/docs-client",
-      "version": "1.0.19",
+      "version": "1.0.20",
       "dependencies": {
         "@octokit/rest": "^22.0.0",
         "yaml": "^2.0.0",

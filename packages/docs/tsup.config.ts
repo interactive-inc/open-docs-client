@@ -5,9 +5,6 @@ export default defineConfig({
   outDir: "build",
   format: ["esm"],
   clean: true,
-  /**
-   * TODO: trueにするとエラーになる
-   */
-  dts: false,
-  splitting: false,
+  dts: true,
+  splitting: false
 })

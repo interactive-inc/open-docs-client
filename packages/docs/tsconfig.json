@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
@@ -12,7 +11,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "paths": { "@/*": ["./lib/*"] }
   },
-  "include": ["lib/**/*.ts"]
+  "include": ["lib/**/*.ts", "bin/**/*.ts"]
 }
