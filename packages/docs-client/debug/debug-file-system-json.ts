@@ -1,9 +1,9 @@
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { DocClient } from "../lib/doc-client"
-import { DocFileSystem } from "../lib/doc-file-system"
-import { DocFileSystemJsonRead } from "../lib/doc-file-system-json-read"
-import { DocFileSystemWrite } from "../lib/doc-file-system-write"
+import { DocFileSystem } from "../lib/modules/file-system/doc-file-system"
+import { DocFileSystemJsonRead } from "../lib/modules/file-system/doc-file-system-json-read"
+import { DocFileSystemNodeWrite } from "../lib/modules/file-system/doc-file-system-node-write"
 
 /**
  * Debug script for JSON file system
@@ -33,7 +33,7 @@ const jsonReader = new DocFileSystemJsonRead({
 })
 
 // Setup local writer (not used)
-const localWriter = new DocFileSystemWrite({
+const localWriter = new DocFileSystemNodeWrite({
   basePath: "/tmp/docs-json-output",
 })
 
@@ -118,8 +118,8 @@ const installFile = await client
   .file("docs/getting-started/installation.md")
   .read()
 if (!(installFile instanceof Error)) {
-  console.log("Title:", installFile.content.title)
-  const meta = installFile.content.meta()
+  console.log("Title:", installFile.content().title)
+  const meta = installFile.content().meta()
   console.log("Meta keys:", Object.keys(meta))
 }
 
@@ -163,7 +163,7 @@ console.log("\n--- Error Cases ---")
 const nonExistent = await jsonReader.readFile("non-existent.md")
 console.log("Non-existent file:", nonExistent === null ? "null ✓" : "error")
 
-const modTime = await jsonReader.getFileModifiedTime("README.md")
+const modTime = await jsonReader.getFileUpdatedTime("README.md")
 console.log(
   "Modified time:",
   modTime instanceof Error

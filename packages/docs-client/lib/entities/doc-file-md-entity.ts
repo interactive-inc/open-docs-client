@@ -24,7 +24,7 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
   /**
    * Content
    */
-  get content(): DocFileMdContentValue<T> {
+  content(): DocFileMdContentValue<T> {
     return new DocFileMdContentValue<T>(this.value.content, this.customSchema)
   }
 
@@ -50,7 +50,7 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
       | UpdateFunction<DocFileMdContentValue<T>>,
   ): DocFileMdEntity<T> {
     if (typeof contentOrUpdater === "function") {
-      const updatedContent = contentOrUpdater(this.content)
+      const updatedContent = contentOrUpdater(this.content())
       return new DocFileMdEntity<T>(
         { ...this.value, content: updatedContent.value },
         this.customSchema,
@@ -95,9 +95,9 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
       | UpdateFunction<DocFileMdMetaValue<T>>,
   ): DocFileMdEntity<T> {
     if (typeof metaOrUpdater === "function") {
-      const currentMeta = this.content.meta()
+      const currentMeta = this.content().meta()
       const updatedMeta = metaOrUpdater(currentMeta)
-      const draft = this.content.withMeta(updatedMeta)
+      const draft = this.content().withMeta(updatedMeta)
       return new DocFileMdEntity<T>(
         {
           ...this.value,
@@ -106,7 +106,7 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
         this.customSchema,
       )
     }
-    const draft = this.content.withMeta(metaOrUpdater)
+    const draft = this.content().withMeta(metaOrUpdater)
     return new DocFileMdEntity<T>(
       {
         ...this.value,
@@ -117,7 +117,7 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
   }
 
   withTitle(title: string): DocFileMdEntity<T> {
-    const draft = this.content.withTitle(title)
+    const draft = this.content().withTitle(title)
     return new DocFileMdEntity<T>(
       {
         ...this.value,
@@ -131,7 +131,7 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
     description: string,
     defaultTitle?: string,
   ): DocFileMdEntity<T> {
-    const draft = this.content.withDescription(description, defaultTitle)
+    const draft = this.content().withDescription(description, defaultTitle)
     return new DocFileMdEntity<T>(
       {
         ...this.value,

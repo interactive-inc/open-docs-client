@@ -102,7 +102,9 @@ export class DocFileMdMetaValue<T extends DocCustomSchema> {
 
     const field = factory.fromType(key, schemaField.type, value)
 
-    return field.value as FieldValueType<
+    const nullable = field.value ?? null
+
+    return nullable as FieldValueType<
       ExtractFieldType<T[K]>,
       ExtractRequired<T[K]>
     >

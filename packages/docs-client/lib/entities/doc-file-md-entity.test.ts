@@ -64,7 +64,7 @@ test("DocFileMdEntity - content getterが値オブジェクトを返す", () => 
     },
   )
 
-  const content = entity.content
+  const content = entity.content()
   expect(content).toBeInstanceOf(DocFileMdContentValue)
   expect(content.title).toBe("タイトル")
   expect(content.description).toBe("説明文")
@@ -134,12 +134,12 @@ test("DocFileMdEntity - withContentで新しいインスタンスを作成", () 
     },
   )
 
-  const newContent = entity.content.withTitle("新しいタイトル")
+  const newContent = entity.content().withTitle("新しいタイトル")
   const newEntity = entity.withContent(newContent)
 
   expect(newEntity).not.toBe(entity) // 新しいインスタンス
-  expect(newEntity.content.title).toBe("新しいタイトル")
-  expect(entity.content.title).toBe("古いタイトル") // 元は変更されない
+  expect(newEntity.content().title).toBe("新しいタイトル")
+  expect(entity.content().title).toBe("古いタイトル") // 元は変更されない
 })
 
 test("DocFileMdEntity - withContent関数オーバーロードで新しいインスタンスを作成", () => {
@@ -176,18 +176,18 @@ test("DocFileMdEntity - withContent関数オーバーロードで新しいイン
   )
 
   expect(newEntity).not.toBe(entity) // 新しいインスタンス
-  expect(newEntity.content.title).toBe("更新されたタイトル")
-  expect(newEntity.content.description).toBe("更新された説明")
-  expect(entity.content.title).toBe("古いタイトル") // 元は変更されない
-  expect(entity.content.description).toBe("古い説明") // 元は変更されない
+  expect(newEntity.content().title).toBe("更新されたタイトル")
+  expect(newEntity.content().description).toBe("更新された説明")
+  expect(entity.content().title).toBe("古いタイトル") // 元は変更されない
+  expect(entity.content().description).toBe("古い説明") // 元は変更されない
 
   // チェーンされた更新も可能
   const chainedEntity = entity
     .withContent((content) => content.withTitle("チェーン1"))
     .withContent((content) => content.withDescription("チェーン2"))
 
-  expect(chainedEntity.content.title).toBe("チェーン1")
-  expect(chainedEntity.content.description).toBe("チェーン2")
+  expect(chainedEntity.content().title).toBe("チェーン1")
+  expect(chainedEntity.content().description).toBe("チェーン2")
 })
 
 test("DocFileMdEntity - withPath関数オーバーロードで新しいインスタンスを作成", () => {
@@ -268,11 +268,11 @@ test("DocFileMdEntity - withMeta関数オーバーロードで新しいインス
   )
 
   expect(newEntity).not.toBe(entity) // 新しいインスタンス
-  const newMeta = newEntity.content.meta()
+  const newMeta = newEntity.content().meta()
   expect(newMeta.multiText("tags")).toEqual(["new", "updated"])
   expect(newMeta.number("priority")).toBe(5)
 
-  const oldMeta = entity.content.meta()
+  const oldMeta = entity.content().meta()
   expect(oldMeta.multiText("tags")).toEqual(["old"]) // 元は変更されない
   expect(oldMeta.number("priority")).toBe(1) // 元は変更されない
 })
@@ -425,7 +425,7 @@ test("DocFileMdEntity - ジェネリック型パラメータの推論", () => {
   expectType<DocFileMdEntity<TestSchema>>(entity)
 
   // content の型も正しく推論される
-  const content = entity.content
+  const content = entity.content()
   expectType<DocFileMdContentValue<TestSchema>>(content)
 })
 
@@ -484,7 +484,7 @@ test("DocFileMdEntity - withContent メソッドの型安全性", () => {
 
   // 戻り値の型が保持される
   expectType<DocFileMdEntity<TestSchema>>(newEntity)
-  expect(newEntity.content.title).toBe("新しいタイトル")
+  expect(newEntity.content().title).toBe("新しいタイトル")
 })
 
 test("DocFileMdEntity - エンティティ値の型構造", () => {
@@ -570,7 +570,7 @@ test("DocFileMdEntity - frontMatter へのアクセスの型安全性", () => {
   )
 
   // frontMatter へのアクセス
-  const fm = entity.content.meta()
+  const fm = entity.content().meta()
 
   // 型安全なアクセス
   expect(fm.value.title).toBe("FMタイトル")

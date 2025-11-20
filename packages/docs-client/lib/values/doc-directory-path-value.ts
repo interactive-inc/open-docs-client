@@ -1,4 +1,4 @@
-import type { DocPathSystem } from "../doc-path-system"
+import type { DocPathSystem } from "../modules/path-system/doc-path-system"
 import { DocFilePathValue } from "./doc-file-path-value"
 
 type Value = {

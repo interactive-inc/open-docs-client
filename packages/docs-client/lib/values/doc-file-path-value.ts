@@ -1,6 +1,6 @@
 import { zDocFilePath } from "@/models"
 import type { DocFilePath } from "@/types"
-import type { DocPathSystem } from "../doc-path-system"
+import type { DocPathSystem } from "../modules/path-system/doc-path-system"
 
 /**
  * Value object for file path information

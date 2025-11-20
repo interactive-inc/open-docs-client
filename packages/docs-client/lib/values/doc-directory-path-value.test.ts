@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { DocPathSystem } from "../doc-path-system"
+import { DocPathSystem } from "../modules/path-system/doc-path-system"
 import { DocDirectoryPathValue } from "./doc-directory-path-value"
 
 test("DocDirectoryPathValue - 基本的な作成とプロパティアクセス", () => {

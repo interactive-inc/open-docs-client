@@ -63,16 +63,22 @@ export const docCustomSchemaField = {
       required,
     }
   },
-  relation(required: boolean) {
+  relation(required: boolean, path: string) {
     return {
       type: "relation" as const,
       required,
+      title: null,
+      description: null,
+      path,
     }
   },
-  multiRelation(required: boolean) {
+  multiRelation(required: boolean, path: string) {
     return {
       type: "multi-relation" as const,
       required,
+      title: null,
+      description: null,
+      path,
     }
   },
   selectText(required: boolean) {

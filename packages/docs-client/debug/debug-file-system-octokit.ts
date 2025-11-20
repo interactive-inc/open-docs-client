@@ -1,7 +1,7 @@
 import { DocClient } from "../lib/doc-client"
-import { DocFileSystem } from "../lib/doc-file-system"
-import { DocFileSystemOctokitRead } from "../lib/doc-file-system-octokit-read"
-import { DocFileSystemWrite } from "../lib/doc-file-system-write"
+import { DocFileSystem } from "../lib/modules/file-system/doc-file-system"
+import { DocFileSystemNodeWrite } from "../lib/modules/file-system/doc-file-system-node-write"
+import { DocFileSystemOctokitRead } from "../lib/modules/file-system/doc-file-system-octokit-read"
 
 /**
  * Debug script for GitHub file system integration
@@ -29,7 +29,7 @@ const octokitReader = new DocFileSystemOctokitRead({
 })
 
 // Setup local writer (not used)
-const localWriter = new DocFileSystemWrite({
+const localWriter = new DocFileSystemNodeWrite({
   basePath: "/tmp/docs-output",
 })
 
@@ -110,8 +110,8 @@ if (!(studioIndexFile instanceof Error)) {
 console.log("\n--- studio/features/manage-schema.md ---")
 const nestedFile = await client.file("studio/features/manage-schema.md").read()
 if (!(nestedFile instanceof Error)) {
-  console.log("Title:", nestedFile.content.title)
-  const meta = nestedFile.content.meta()
+  console.log("Title:", nestedFile.content().title)
+  const meta = nestedFile.content().meta()
   console.log("Meta keys:", Object.keys(meta))
 } else {
   console.error("Error:", nestedFile.message)

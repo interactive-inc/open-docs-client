@@ -6,7 +6,7 @@ import type {
   ExtractFieldType,
   UpdateFunction,
 } from "@/types"
-import { DocMarkdownSystem } from "../doc-markdown-system"
+import { DocMarkdownSystem } from "../modules/markdown-system/doc-markdown-system"
 import { DocFileMdMetaValue } from "./doc-file-md-meta-value"
 
 /**

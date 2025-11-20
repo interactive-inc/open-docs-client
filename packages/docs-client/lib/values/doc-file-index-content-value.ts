@@ -6,7 +6,7 @@ import type {
   DocFileIndexContent,
   DocFileIndexMeta,
 } from "@/types"
-import { DocMarkdownSystem } from "../doc-markdown-system"
+import { DocMarkdownSystem } from "../modules/markdown-system/doc-markdown-system"
 import { DocFileIndexMetaValue } from "./doc-file-index-meta-value"
 
 /**

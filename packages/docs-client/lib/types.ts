@@ -1,7 +1,4 @@
 import type { z } from "zod"
-import type { DocFileIndexReference } from "./doc-file-index-reference"
-import type { DocFileMdReference } from "./doc-file-md-reference"
-import type { DocFileUnknownReference } from "./doc-file-unknown-reference"
 import type {
   zDocClientConfig,
   zDocFileIndex,
@@ -43,6 +40,9 @@ import type {
   zDocSchemaFieldSelectText,
   zDocSchemaFieldText,
 } from "./models"
+import type { DocFileIndexReference } from "./references/doc-file-index-reference"
+import type { DocFileMdReference } from "./references/doc-file-md-reference"
+import type { DocFileUnknownReference } from "./references/doc-file-unknown-reference"
 
 /**
  * Generic updater function type that takes a value and returns the same type
@@ -583,123 +583,3 @@ export type GetIndexFieldType<
  * Infers DocFileMd type from the result of defineSchema
  */
 export type InferDocFileMd<T> = T extends DocCustomSchema ? DocFileMd<T> : never
-
-/**
- * Read-only file system interface for document operations
- */
-export type DocFileSystemReadType = {
-  /**
-   * Read file content at the specified path
-   */
-  readFile(relativePath: string): Promise<string | null | Error>
-
-  /**
-   * Get file name from path
-   */
-  readFileName(relativePath: string): string
-
-  /**
-   * Get file extension from path
-   */
-  readFileExtension(relativePath: string): string
-
-  /**
-   * Get directory path where the file exists
-   */
-  readFileDirectory(relativePath: string): string
-
-  /**
-   * Get list of entries in directory
-   */
-  readDirectoryFileNames(relativePath?: string): Promise<string[] | Error>
-
-  /**
-   * Get list of file paths in directory
-   */
-  readDirectoryFilePaths(relativePath: string): Promise<string[] | Error>
-
-  /**
-   * Check if path is a directory
-   */
-  isDirectory(relativePath: string): Promise<boolean>
-
-  /**
-   * Check if path is a file
-   */
-  isFile(relativePath: string): Promise<boolean>
-
-  /**
-   * Check if file or directory exists
-   */
-  exists(relativePath: string): Promise<boolean>
-
-  /**
-   * Check if directory exists
-   */
-  directoryExists(relativePath: string): Promise<boolean>
-
-  /**
-   * Check if file exists
-   */
-  fileExists(relativePath: string): Promise<boolean>
-
-  /**
-   * Get base path
-   */
-  getBasePath(): string
-
-  /**
-   * Convert relative path to absolute path
-   */
-  resolve(relativePath: string): string
-
-  /**
-   * Get file size in bytes
-   */
-  getFileSize(relativePath: string): Promise<number | Error>
-
-  /**
-   * Get file last modified time
-   */
-  getFileModifiedTime(relativePath: string): Promise<Date | Error>
-
-  /**
-   * Get file creation time
-   */
-  getFileCreatedTime(relativePath: string): Promise<Date | Error>
-}
-
-/**
- * Write-only file system interface for document operations
- */
-export type DocFileSystemWriteType = {
-  /**
-   * Write content to file at the specified path (creates directory if needed)
-   */
-  writeFile(relativePath: string, content: string): Promise<Error | null>
-
-  /**
-   * Delete file at the specified path
-   */
-  deleteFile(relativePath: string): Promise<Error | null>
-
-  /**
-   * Create directory
-   */
-  createDirectory(relativePath: string): Promise<Error | null>
-
-  /**
-   * Create directory if it doesn't exist
-   */
-  ensureDirectoryExists(relativePath: string): Promise<Error | null>
-
-  /**
-   * Copy file
-   */
-  copyFile(sourcePath: string, destinationPath: string): Promise<Error | null>
-
-  /**
-   * Move file
-   */
-  moveFile(sourcePath: string, destinationPath: string): Promise<Error | null>
-}

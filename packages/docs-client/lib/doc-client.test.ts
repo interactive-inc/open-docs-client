@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test"
 import { DocClient } from "./doc-client"
-import { DocFileSystemMock } from "./doc-file-system-mock"
-import { DocMarkdownSystem } from "./doc-markdown-system"
-import { DocPathSystem } from "./doc-path-system"
+import { DocFileSystemMock } from "./modules/file-system/doc-file-system-mock"
+import { DocMarkdownSystem } from "./modules/markdown-system/doc-markdown-system"
+import { DocPathSystem } from "./modules/path-system/doc-path-system"
 
 // 共通のMockインスタンスを作成（自動的にmockDirectoryDataが読み込まれる）
 const fileSystemMock = DocFileSystemMock.create()

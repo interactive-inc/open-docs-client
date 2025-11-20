@@ -1,12 +1,12 @@
-import { DocDirectoryReference } from "./doc-directory-reference"
-import { DocFileIndexReference } from "./doc-file-index-reference"
-import { DocFileMdReference } from "./doc-file-md-reference"
-import type { DocFileSystem } from "./doc-file-system"
-import { DocFileTreeSystem } from "./doc-file-tree-system"
-import { DocFileUnknownReference } from "./doc-file-unknown-reference"
-import { DocMarkdownSystem } from "./doc-markdown-system"
-import { DocPathSystem } from "./doc-path-system"
 import { zDocClientConfig } from "./models"
+import type { DocFileSystemInterface } from "./modules/file-system/doc-file-system.interface"
+import { DocFileTreeSystem } from "./modules/file-tree-system/doc-file-tree-system"
+import { DocMarkdownSystem } from "./modules/markdown-system/doc-markdown-system"
+import { DocPathSystem } from "./modules/path-system/doc-path-system"
+import { DocDirectoryReference } from "./references/doc-directory-reference"
+import { DocFileIndexReference } from "./references/doc-file-index-reference"
+import { DocFileMdReference } from "./references/doc-file-md-reference"
+import { DocFileUnknownReference } from "./references/doc-file-unknown-reference"
 import type {
   DocClientConfig,
   DocCustomSchema,
@@ -16,7 +16,7 @@ import type {
 } from "./types"
 
 type Props = {
-  fileSystem: DocFileSystem
+  fileSystem: DocFileSystemInterface
   pathSystem?: DocPathSystem
   markdownSystem?: DocMarkdownSystem
   fileTreeSystem?: DocFileTreeSystem
@@ -27,7 +27,7 @@ type Props = {
 }
 
 export class DocClient {
-  readonly fileSystem: DocFileSystem
+  readonly fileSystem: DocFileSystemInterface
   readonly pathSystem: DocPathSystem
   readonly markdownSystem: DocMarkdownSystem
   readonly fileTreeSystem: DocFileTreeSystem
@@ -52,15 +52,15 @@ export class DocClient {
       ? zDocClientConfig.parse(props.config)
       : defaultConfig
 
-    this.fileTreeSystem =
-      props.fileTreeSystem ??
-      new DocFileTreeSystem({
-        fileSystem: this.fileSystem,
-        pathSystem: this.pathSystem,
-        indexFileName: this.config.indexFileName,
-        archiveDirectoryName: this.config.archiveDirectoryName,
-        config: this.config,
-      })
+    const fileTreeSystem = new DocFileTreeSystem({
+      fileSystem: this.fileSystem,
+      pathSystem: this.pathSystem,
+      indexFileName: this.config.indexFileName,
+      archiveDirectoryName: this.config.archiveDirectoryName,
+      config: this.config,
+    })
+
+    this.fileTreeSystem = props.fileTreeSystem ?? fileTreeSystem
   }
 
   basePath(): string {
