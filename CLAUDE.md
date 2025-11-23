@@ -1,8 +1,8 @@
-See @.github/copilot-instructions.md for project overview and @package.json for available npm commands for this project.
+日本語で応答してください。
+
+See @.github/copilot-instructions.md for project overview and @package.json for available bun commands for this project.
 
 ## Additional Instructions
 
 - @.github/instructions/core.instructions.md
 - @.github/instructions/ts.instructions.md
-- @.github/instructions/ts.tanstack-query.instructions.md
-- @.github/instructions/ts.tanstack-router.instructions.md

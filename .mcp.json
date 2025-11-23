@@ -1,13 +1,9 @@
 {
   "mcpServers": {
-    "context7": {
+    "chrome-devtools": {
+      "type": "stdio",
       "command": "bunx",
-      "args": ["@upstash/context7-mcp"],
-      "env": {}
-    },
-    "playwright": {
-      "command": "bunx",
-      "args": ["@playwright/mcp"],
+      "args": ["chrome-devtools-mcp@latest"],
       "env": {}
     }
   }

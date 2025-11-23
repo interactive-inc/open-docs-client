@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "paths": { "@/*": ["./lib/*"] }
   },
-  "include": ["mcp.ts"]
+  "include": ["lib/**/*.ts"]
 }
