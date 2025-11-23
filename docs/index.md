@@ -10,7 +10,7 @@ hero:
       link: /guides
     - theme: alt
       text: GitHub
-      link: https://github.com/interactive-inc/open-docs
+      link: https://github.com/interactive-inc/open-docs-client
     - theme: alt
       text: Contact
       link: https://www.inta.co.jp/contact/

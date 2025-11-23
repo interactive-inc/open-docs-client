@@ -1,5 +1,3 @@
-.PHONY: deploy check test build install
-
 # Deploy client (with checks and tests)
 deploy:
 	bun biome check . --fix --unsafe

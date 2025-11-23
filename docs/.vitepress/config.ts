@@ -3,8 +3,8 @@ import { defineConfig } from "vitepress"
 export default defineConfig({
   srcExclude: ["studio/debug", "studio/features", "studio/pages"],
   /** https://vitepress.dev/guide/deploy#setting-a-public-base-path */
-  base: "/open-docs/",
-  title: "@interactive-inc/docs",
+  base: "/open-docs-client/",
+  title: "@interactive-inc/docs-client",
   description: "A VitePress Site",
   appearance: "force-dark",
   // locales: {
@@ -75,7 +75,7 @@ export default defineConfig({
     socialLinks: [
       {
         icon: "github",
-        link: "https://github.com/interactiive-inc/open-docs",
+        link: "https://github.com/interactiive-inc/open-docs-client",
       },
     ],
     search: {

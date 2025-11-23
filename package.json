@@ -47,5 +47,10 @@
     "./file-system-mock": "./build/file-system-mock.js",
     "./file-system-node": "./build/file-system-node.js",
     "./file-system-octokit": "./build/file-system-octokit.js"
+  },
+  "homepage": "https://interactive-inc.github.io/open-docs-client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/interactive-inc/open-docs-client.git"
   }
 }

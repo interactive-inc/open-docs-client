@@ -1,8 +1,5 @@
-# @interactive-inc/docs
+## Installation
 
 ```
-bun i
-bun run dev
+$ bun i @interactive-inc/docs-client
 ```
-
-https://www.npmjs.com/package/@interactive-inc/docs
