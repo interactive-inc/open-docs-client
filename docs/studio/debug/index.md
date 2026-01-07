@@ -1,6 +1,0 @@
----
-icon: ""
-schema: {}
----
-
-# debug
