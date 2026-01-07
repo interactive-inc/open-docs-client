@@ -3,8 +3,10 @@ import { zDocFileIndexContent } from "@/models"
 import type {
   DocClientConfig,
   DocCustomSchema,
+  DocDirectoryMeta,
   DocFileIndexContent,
   DocFileIndexMeta,
+  DocFileIndexSchema,
 } from "@/types"
 import { DocMarkdownSystem } from "../modules/markdown-system/doc-markdown-system"
 import { DocFileIndexMetaValue } from "./doc-file-index-meta-value"
@@ -121,6 +123,37 @@ export class DocFileIndexContentValue<T extends DocCustomSchema> {
   }
 
   /**
+   * Generate from Markdown text with .meta.json
+   * FrontMatter is ignored, only body/title/description are extracted
+   */
+  static fromMarkdownWithDirectoryMeta<T extends DocCustomSchema>(
+    markdown: string,
+    customSchema: T,
+    config: DocClientConfig,
+    directoryMeta: DocDirectoryMeta,
+  ) {
+    const engine = new DocMarkdownSystem()
+
+    const meta: DocFileIndexMeta<T> = {
+      type: "index-meta",
+      icon: directoryMeta.icon ?? config.defaultIndexIcon,
+      schema: (directoryMeta.schema ?? {}) as DocFileIndexSchema<keyof T>,
+    }
+
+    return new DocFileIndexContentValue<T>(
+      {
+        type: "markdown-index",
+        body: engine.extractBody(markdown),
+        title: engine.extractTitle(markdown) || "",
+        description: engine.extractDescription(markdown) || "",
+        meta,
+      },
+      customSchema,
+      config,
+    )
+  }
+
+  /**
    * Update content
    */
   withBody(body: string): DocFileIndexContentValue<T> {
@@ -173,6 +206,34 @@ export class DocFileIndexContentValue<T extends DocCustomSchema> {
     const content = `---\ntitle: "${directoryName}"\ndescription: ""\nicon: ""\nschema: {}\n---\n\n# ${directoryName}\n`
     return DocFileIndexContentValue.fromMarkdown<T>(
       content,
+      customSchema,
+      config,
+    )
+  }
+
+  /**
+   * Generate default index.md content with .meta.json
+   */
+  static emptyWithDirectoryMeta<T extends DocCustomSchema = DocCustomSchema>(
+    directoryName: string,
+    customSchema: T,
+    config: DocClientConfig,
+    directoryMeta: DocDirectoryMeta,
+  ): DocFileIndexContentValue<T> {
+    const meta: DocFileIndexMeta<T> = {
+      type: "index-meta",
+      icon: directoryMeta.icon ?? config.defaultIndexIcon,
+      schema: (directoryMeta.schema ?? {}) as DocFileIndexSchema<keyof T>,
+    }
+
+    return new DocFileIndexContentValue<T>(
+      {
+        type: "markdown-index",
+        body: `# ${directoryName}\n`,
+        title: directoryName,
+        description: "",
+        meta,
+      },
       customSchema,
       config,
     )

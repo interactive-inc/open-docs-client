@@ -507,4 +507,13 @@ export const zDocClientConfig = z.object({
   defaultDirectoryName: z.string(),
   indexMetaIncludes: z.array(z.string()),
   directoryExcludes: z.array(z.string()),
+  metaFileName: z.string().optional(),
+})
+
+/**
+ * Directory meta (.meta.json)
+ */
+export const zDocDirectoryMeta = z.object({
+  icon: z.string().nullable().optional(),
+  schema: zDocFileIndexSchema.optional(),
 })

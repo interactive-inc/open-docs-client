@@ -1,8 +1,38 @@
 日本語で応答してください。
 
-See @.github/copilot-instructions.md for project overview and @package.json for available bun commands for this project.
-
 ## Additional Instructions
 
 - @.github/instructions/core.instructions.md
 - @.github/instructions/ts.instructions.md
+
+## Overview
+
+ドキュメント管理クライアントライブラリ。ファイル管理と処理を提供する。
+
+## Directory Structure
+
+- `mcp.ts` - MCP実装
+- `tsup.config.ts` - ビルド設定
+- `tsconfig.json` - TypeScript設定
+- `lib/` - コアライブラリ
+  - `entities/` - ドキュメントエンティティ
+  - `modules/` - コアモジュール（file-system, file-tree-system, markdown-system, path-system）
+  - `values/` - 値オブジェクト
+  - `references/` - ディレクトリ・ファイル参照
+- `debug/` - デバッグ用（npm未公開）
+- `docs/` - VitePressドキュメントサイト
+
+## Tech Stack
+
+- TypeScript
+- Bun
+- Zod
+- VitePress（ドキュメント）
+- MCP SDK
+- Octokit（GitHub連携）
+
+## Architecture
+
+- npmパッケージとして公開（@interactive-inc/docs-client）
+- 複数ファイルシステム対応（Node.js、JSON、Octokit、Mock）
+- GitHub Pagesでドキュメントホスティング

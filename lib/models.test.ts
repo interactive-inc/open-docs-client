@@ -309,6 +309,7 @@ test("zDocClientConfig - クライアント設定の構造", () => {
         defaultDirectoryName: string
         indexMetaIncludes: string[]
         directoryExcludes: string[]
+        metaFileName?: string
       }
     >
   >()

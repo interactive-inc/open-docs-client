@@ -45,6 +45,10 @@ export class DocFileTreeSystem {
       // Skip directories in exclusion list
       if (this.config.directoryExcludes.includes(fileName)) continue
 
+      // Skip .meta.json file
+      const metaFileName = this.config.metaFileName ?? ".meta.json"
+      if (fileName === metaFileName) continue
+
       const filePath = directoryPath
         ? this.props.pathSystem.join(directoryPath, fileName)
         : fileName
@@ -196,6 +200,10 @@ export class DocFileTreeSystem {
 
       // Skip directories in exclusion list
       if (this.config.directoryExcludes.includes(fileName)) continue
+
+      // Skip .meta.json file
+      const metaFileName = this.config.metaFileName ?? ".meta.json"
+      if (fileName === metaFileName) continue
 
       const filePath = directoryPath
         ? this.props.pathSystem.join(directoryPath, fileName)

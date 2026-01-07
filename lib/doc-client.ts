@@ -46,6 +46,7 @@ export class DocClient {
       defaultDirectoryName: "Directory",
       indexMetaIncludes: [],
       directoryExcludes: [".vitepress"],
+      metaFileName: ".meta.json",
     }
 
     this.config = props.config

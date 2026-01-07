@@ -1,9 +1,11 @@
+import { zDocDirectoryMeta } from "../models"
 import { DocFileIndexEntity } from "../entities/doc-file-index-entity"
 import type { DocFileSystemInterface } from "../modules/file-system/doc-file-system.interface"
 import type { DocPathSystem } from "../modules/path-system/doc-path-system"
 import type {
   DocClientConfig,
   DocCustomSchema,
+  DocDirectoryMeta,
   DocFileIndexSchema,
   RecordKey,
 } from "../types"
@@ -55,6 +57,9 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
   }
 
   async read(): Promise<DocFileIndexEntity<T> | Error> {
+    // Check for .meta.json first
+    const directoryMeta = await this.readDirectoryMeta()
+
     const content = await this.fileSystem.readFile(this.filePath)
 
     if (content instanceof Error) {
@@ -70,11 +75,21 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
         this.pathSystem,
         this.fileSystem.getBasePath(),
       )
-      const contentValue = DocFileIndexContentValue.empty(
-        dirName,
-        this.customSchema,
-        this.props.config,
-      )
+
+      // Use .meta.json if available
+      const contentValue = directoryMeta
+        ? DocFileIndexContentValue.emptyWithDirectoryMeta(
+            dirName,
+            this.customSchema,
+            this.props.config,
+            directoryMeta,
+          )
+        : DocFileIndexContentValue.empty(
+            dirName,
+            this.customSchema,
+            this.props.config,
+          )
+
       return new DocFileIndexEntity(
         {
           type: "index",
@@ -92,11 +107,19 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
       this.fileSystem.getBasePath(),
     )
 
-    const contentValue = DocFileIndexContentValue.fromMarkdown(
-      content,
-      this.customSchema,
-      this.props.config,
-    )
+    // Use .meta.json if available, otherwise parse FrontMatter
+    const contentValue = directoryMeta
+      ? DocFileIndexContentValue.fromMarkdownWithDirectoryMeta(
+          content,
+          this.customSchema,
+          this.props.config,
+          directoryMeta,
+        )
+      : DocFileIndexContentValue.fromMarkdown(
+          content,
+          this.customSchema,
+          this.props.config,
+        )
 
     return new DocFileIndexEntity(
       {
@@ -107,6 +130,33 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
       },
       this.customSchema,
     )
+  }
+
+  /**
+   * Read .meta.json if exists
+   */
+  private async readDirectoryMeta(): Promise<DocDirectoryMeta | null> {
+    const metaFileName = this.props.config.metaFileName ?? ".meta.json"
+    const metaPath = this.pathSystem.join(this.durectoryPath, metaFileName)
+
+    const metaContent = await this.fileSystem.readFile(metaPath)
+
+    if (metaContent instanceof Error) {
+      return null
+    }
+
+    if (metaContent === null) {
+      return null
+    }
+
+    const parsed = JSON.parse(metaContent)
+    const result = zDocDirectoryMeta.safeParse(parsed)
+
+    if (result.success === false) {
+      return null
+    }
+
+    return result.data
   }
 
   async readSchemaValue(): Promise<DocFileIndexSchema<RecordKey>> {

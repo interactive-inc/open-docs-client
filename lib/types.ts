@@ -1,6 +1,7 @@
 import type { z } from "zod"
 import type {
   zDocClientConfig,
+  zDocDirectoryMeta,
   zDocFileIndex,
   zDocFileIndexSchemaField,
   zDocFileMd,
@@ -501,6 +502,11 @@ export type RecordKey = PropertyKey
  * DocClient configuration
  */
 export type DocClientConfig = z.infer<typeof zDocClientConfig>
+
+/**
+ * Directory meta (.meta.json)
+ */
+export type DocDirectoryMeta = z.infer<typeof zDocDirectoryMeta>
 
 /**
  * Type definitions for DocFileMdMetaValue
