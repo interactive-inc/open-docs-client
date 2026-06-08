@@ -23,11 +23,7 @@ test("DocCustomSchemaFieldFactory - fromType メソッドの型推論", () => {
   })
   expect(textField).toBeInstanceOf(DocCustomSchemaFieldTextValue)
   // union 型から特定の型を抽出
-  assertType<
-    DocCustomSchemaFieldTextValue<"title"> extends typeof textField
-      ? true
-      : false
-  >()
+  assertType<DocCustomSchemaFieldTextValue<"title"> extends typeof textField ? true : false>()
 
   // number フィールド
   const numberField = factory.fromType("count", {
@@ -36,11 +32,7 @@ test("DocCustomSchemaFieldFactory - fromType メソッドの型推論", () => {
   })
   expect(numberField).toBeInstanceOf(DocCustomSchemaFieldNumberValue)
   // union 型から特定の型を抽出
-  assertType<
-    DocCustomSchemaFieldNumberValue<"count"> extends typeof numberField
-      ? true
-      : false
-  >()
+  assertType<DocCustomSchemaFieldNumberValue<"count"> extends typeof numberField ? true : false>()
 
   // boolean フィールド
   const booleanField = factory.fromType("isActive", {
@@ -50,9 +42,7 @@ test("DocCustomSchemaFieldFactory - fromType メソッドの型推論", () => {
   expect(booleanField).toBeInstanceOf(DocCustomSchemaFieldBooleanValue)
   // union 型から特定の型を抽出
   assertType<
-    DocCustomSchemaFieldBooleanValue<"isActive"> extends typeof booleanField
-      ? true
-      : false
+    DocCustomSchemaFieldBooleanValue<"isActive"> extends typeof booleanField ? true : false
   >()
 })
 
@@ -67,9 +57,7 @@ test("DocCustomSchemaFieldFactory - 選択フィールドの型推論", () => {
   expect(selectTextField).toBeInstanceOf(DocCustomSchemaFieldSelectTextValue)
   // union 型から特定の型を抽出
   assertType<
-    DocCustomSchemaFieldSelectTextValue<"category"> extends typeof selectTextField
-      ? true
-      : false
+    DocCustomSchemaFieldSelectTextValue<"category"> extends typeof selectTextField ? true : false
   >()
 
   // select-number フィールド
@@ -77,9 +65,7 @@ test("DocCustomSchemaFieldFactory - 選択フィールドの型推論", () => {
     type: "select-number",
     required: false,
   })
-  expect(selectNumberField).toBeInstanceOf(
-    DocCustomSchemaFieldSelectNumberValue,
-  )
+  expect(selectNumberField).toBeInstanceOf(DocCustomSchemaFieldSelectNumberValue)
   // union 型から特定の型を抽出
   assertType<
     DocCustomSchemaFieldSelectNumberValue<"priority"> extends typeof selectNumberField
@@ -99,9 +85,7 @@ test("DocCustomSchemaFieldFactory - リレーションフィールドの型推�
   expect(relationField).toBeInstanceOf(DocCustomSchemaFieldRelationValue)
   // union 型から特定の型を抽出
   assertType<
-    DocCustomSchemaFieldRelationValue<"author"> extends typeof relationField
-      ? true
-      : false
+    DocCustomSchemaFieldRelationValue<"author"> extends typeof relationField ? true : false
   >()
 })
 
@@ -116,9 +100,7 @@ test("DocCustomSchemaFieldFactory - 複数値フィールドの型推論", () =>
   expect(multiTextField).toBeInstanceOf(DocCustomSchemaFieldMultiTextValue)
   // union 型から特定の型を抽出
   assertType<
-    DocCustomSchemaFieldMultiTextValue<"tags"> extends typeof multiTextField
-      ? true
-      : false
+    DocCustomSchemaFieldMultiTextValue<"tags"> extends typeof multiTextField ? true : false
   >()
 
   // multi-number フィールド
@@ -129,9 +111,7 @@ test("DocCustomSchemaFieldFactory - 複数値フィールドの型推論", () =>
   expect(multiNumberField).toBeInstanceOf(DocCustomSchemaFieldMultiNumberValue)
   // union 型から特定の型を抽出
   assertType<
-    DocCustomSchemaFieldMultiNumberValue<"scores"> extends typeof multiNumberField
-      ? true
-      : false
+    DocCustomSchemaFieldMultiNumberValue<"scores"> extends typeof multiNumberField ? true : false
   >()
 
   // multi-relation フィールド
@@ -139,9 +119,7 @@ test("DocCustomSchemaFieldFactory - 複数値フィールドの型推論", () =>
     type: "multi-relation",
     required: false,
   })
-  expect(multiRelationField).toBeInstanceOf(
-    DocCustomSchemaFieldMultiRelationValue,
-  )
+  expect(multiRelationField).toBeInstanceOf(DocCustomSchemaFieldMultiRelationValue)
   // union 型から特定の型を抽出
   assertType<
     DocCustomSchemaFieldMultiRelationValue<"reviewers"> extends typeof multiRelationField
@@ -158,9 +136,7 @@ test("DocCustomSchemaFieldFactory - 複数選択フィールドの型推論", ()
     type: "multi-select-text",
     required: true,
   })
-  expect(multiSelectTextField).toBeInstanceOf(
-    DocCustomSchemaFieldMultiSelectTextValue,
-  )
+  expect(multiSelectTextField).toBeInstanceOf(DocCustomSchemaFieldMultiSelectTextValue)
   // union 型から特定の型を抽出
   assertType<
     DocCustomSchemaFieldMultiSelectTextValue<"categories"> extends typeof multiSelectTextField
@@ -173,9 +149,7 @@ test("DocCustomSchemaFieldFactory - 複数選択フィールドの型推論", ()
     type: "multi-select-number",
     required: false,
   })
-  expect(multiSelectNumberField).toBeInstanceOf(
-    DocCustomSchemaFieldMultiSelectNumberValue,
-  )
+  expect(multiSelectNumberField).toBeInstanceOf(DocCustomSchemaFieldMultiSelectNumberValue)
   // union 型から特定の型を抽出
   assertType<
     DocCustomSchemaFieldMultiSelectNumberValue<"ratings"> extends typeof multiSelectNumberField
@@ -191,58 +165,20 @@ test("DocCustomSchemaFieldFactory - fromType の戻り値の型", () => {
   type FromTypeResult = ReturnType<typeof factory.fromType>
 
   // 各フィールドタイプの値オブジェクトがユニオンに含まれる
+  assertType<DocCustomSchemaFieldTextValue<string> extends FromTypeResult ? true : false>()
+  assertType<DocCustomSchemaFieldNumberValue<string> extends FromTypeResult ? true : false>()
+  assertType<DocCustomSchemaFieldBooleanValue<string> extends FromTypeResult ? true : false>()
+  assertType<DocCustomSchemaFieldSelectTextValue<string> extends FromTypeResult ? true : false>()
+  assertType<DocCustomSchemaFieldSelectNumberValue<string> extends FromTypeResult ? true : false>()
+  assertType<DocCustomSchemaFieldRelationValue<string> extends FromTypeResult ? true : false>()
+  assertType<DocCustomSchemaFieldMultiTextValue<string> extends FromTypeResult ? true : false>()
+  assertType<DocCustomSchemaFieldMultiNumberValue<string> extends FromTypeResult ? true : false>()
+  assertType<DocCustomSchemaFieldMultiRelationValue<string> extends FromTypeResult ? true : false>()
   assertType<
-    DocCustomSchemaFieldTextValue<string> extends FromTypeResult ? true : false
+    DocCustomSchemaFieldMultiSelectTextValue<string> extends FromTypeResult ? true : false
   >()
   assertType<
-    DocCustomSchemaFieldNumberValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldBooleanValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldSelectTextValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldSelectNumberValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldRelationValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldMultiTextValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldMultiNumberValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldMultiRelationValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldMultiSelectTextValue<string> extends FromTypeResult
-      ? true
-      : false
-  >()
-  assertType<
-    DocCustomSchemaFieldMultiSelectNumberValue<string> extends FromTypeResult
-      ? true
-      : false
+    DocCustomSchemaFieldMultiSelectNumberValue<string> extends FromTypeResult ? true : false
   >()
 })
 

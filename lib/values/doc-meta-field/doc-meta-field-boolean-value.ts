@@ -15,14 +15,8 @@ export class DocMetaFieldBooleanValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    value: unknown,
-  ): DocMetaFieldBooleanValue<K> {
-    return new DocMetaFieldBooleanValue<K>(
-      key,
-      zDocMetaFieldBoolean.parse(value),
-    )
+  static from<K extends RecordKey>(key: K, value: unknown): DocMetaFieldBooleanValue<K> {
+    return new DocMetaFieldBooleanValue<K>(key, zDocMetaFieldBoolean.parse(value))
   }
 
   static default<K extends RecordKey>(key: K): DocMetaFieldBooleanValue<K> {

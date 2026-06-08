@@ -1,12 +1,5 @@
-import {
-  zDocCustomSchemaFieldMultiNumber,
-  zDocMetaFieldMultiNumber,
-} from "@/models"
-import type {
-  DocCustomSchemaFieldMultiNumber,
-  DocMetaFieldMultiNumber,
-  RecordKey,
-} from "@/types"
+import { zDocCustomSchemaFieldMultiNumber, zDocMetaFieldMultiNumber } from "@/models"
+import type { DocCustomSchemaFieldMultiNumber, DocMetaFieldMultiNumber, RecordKey } from "@/types"
 
 export class DocCustomSchemaFieldMultiNumberValue<K extends RecordKey> {
   constructor(
@@ -32,9 +25,7 @@ export class DocCustomSchemaFieldMultiNumberValue<K extends RecordKey> {
       return zDocMetaFieldMultiNumber.parse(value)
     } catch {
       if (this.value.required) {
-        throw new Error(
-          `required field "${this.key.toString()}" is missing or invalid`,
-        )
+        throw new Error(`required field "${this.key.toString()}" is missing or invalid`)
       }
       return DocCustomSchemaFieldMultiNumberValue.defaultValue()
     }

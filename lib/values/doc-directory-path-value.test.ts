@@ -49,11 +49,7 @@ test("DocDirectoryPathValue - fromPathWithSystemで相対パスから生成", ()
 
 test("DocDirectoryPathValue - fromPathWithSystemでルートディレクトリ", () => {
   const pathSystem = new DocPathSystem()
-  const value = DocDirectoryPathValue.fromPathWithSystem(
-    ".",
-    "/Users/project",
-    pathSystem,
-  )
+  const value = DocDirectoryPathValue.fromPathWithSystem(".", "/Users/project", pathSystem)
 
   expect(value.path).toBe(".")
   expect(value.name).toBe("")

@@ -15,19 +15,11 @@ export class DocMetaFieldMultiRelationValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    value: unknown,
-  ): DocMetaFieldMultiRelationValue<K> {
-    return new DocMetaFieldMultiRelationValue<K>(
-      key,
-      zDocMetaFieldMultiRelation.parse(value),
-    )
+  static from<K extends RecordKey>(key: K, value: unknown): DocMetaFieldMultiRelationValue<K> {
+    return new DocMetaFieldMultiRelationValue<K>(key, zDocMetaFieldMultiRelation.parse(value))
   }
 
-  static default<K extends RecordKey>(
-    key: K,
-  ): DocMetaFieldMultiRelationValue<K> {
+  static default<K extends RecordKey>(key: K): DocMetaFieldMultiRelationValue<K> {
     return new DocMetaFieldMultiRelationValue(key, [])
   }
 

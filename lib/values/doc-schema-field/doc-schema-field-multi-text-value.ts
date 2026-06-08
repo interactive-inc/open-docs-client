@@ -1,8 +1,4 @@
-import type {
-  DocFileIndexSchemaField,
-  DocSchemaFieldMultiText,
-  RecordKey,
-} from "../../types"
+import type { DocFileIndexSchemaField, DocSchemaFieldMultiText, RecordKey } from "../../types"
 
 /**
  * Multiple text type schema field

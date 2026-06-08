@@ -49,11 +49,7 @@ export class DocFileIndexContentValue<T extends DocCustomSchema> {
    * FrontMatter
    */
   meta(): DocFileIndexMetaValue<T> {
-    return new DocFileIndexMetaValue<T>(
-      this.value.meta,
-      this.customSchema,
-      this.config,
-    )
+    return new DocFileIndexMetaValue<T>(this.value.meta, this.customSchema, this.config)
   }
 
   /**
@@ -72,16 +68,9 @@ export class DocFileIndexContentValue<T extends DocCustomSchema> {
   /**
    * Update description
    */
-  withDescription(
-    description: string,
-    defaultTitle?: string,
-  ): DocFileIndexContentValue<T> {
+  withDescription(description: string, defaultTitle?: string): DocFileIndexContentValue<T> {
     const engine = new DocMarkdownSystem()
-    const updatedBody = engine.updateDescription(
-      this.body,
-      description,
-      defaultTitle || this.title,
-    )
+    const updatedBody = engine.updateDescription(this.body, description, defaultTitle || this.title)
     return new DocFileIndexContentValue<T>(
       {
         ...this.value,
@@ -103,11 +92,7 @@ export class DocFileIndexContentValue<T extends DocCustomSchema> {
   ) {
     const engine = new DocMarkdownSystem()
 
-    const frontMatter = DocFileIndexMetaValue.from(
-      markdown,
-      customSchema,
-      config,
-    )
+    const frontMatter = DocFileIndexMetaValue.from(markdown, customSchema, config)
 
     return new DocFileIndexContentValue<T>(
       {
@@ -204,11 +189,7 @@ export class DocFileIndexContentValue<T extends DocCustomSchema> {
     config: DocClientConfig,
   ): DocFileIndexContentValue<T> {
     const content = `---\ntitle: "${directoryName}"\ndescription: ""\nicon: ""\nschema: {}\n---\n\n# ${directoryName}\n`
-    return DocFileIndexContentValue.fromMarkdown<T>(
-      content,
-      customSchema,
-      config,
-    )
+    return DocFileIndexContentValue.fromMarkdown<T>(content, customSchema, config)
   }
 
   /**

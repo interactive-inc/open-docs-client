@@ -1,8 +1,4 @@
-import type {
-  DocFileIndexSchemaField,
-  DocSchemaFieldSelectText,
-  RecordKey,
-} from "@/types"
+import type { DocFileIndexSchemaField, DocSchemaFieldSelectText, RecordKey } from "@/types"
 
 /**
  * Single select text type schema field

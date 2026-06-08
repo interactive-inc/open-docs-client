@@ -36,10 +36,7 @@ export class DocFileSystem implements DocFileSystemInterface {
   /**
    * Write content to file at the specified path (creates directory if needed)
    */
-  async writeFile(
-    relativePath: string,
-    content: string,
-  ): Promise<Error | null> {
+  async writeFile(relativePath: string, content: string): Promise<Error | null> {
     return this.writer.writeFile(relativePath, content)
   }
 
@@ -78,9 +75,7 @@ export class DocFileSystem implements DocFileSystemInterface {
     return this.reader.readDirectoryFileNames(relativePath)
   }
 
-  async readDirectoryFilePaths(
-    relativePath: string,
-  ): Promise<string[] | Error> {
+  async readDirectoryFilePaths(relativePath: string): Promise<string[] | Error> {
     return this.reader.readDirectoryFilePaths(relativePath)
   }
 
@@ -157,20 +152,14 @@ export class DocFileSystem implements DocFileSystemInterface {
   /**
    * Copy file
    */
-  async copyFile(
-    sourcePath: string,
-    destinationPath: string,
-  ): Promise<Error | null> {
+  async copyFile(sourcePath: string, destinationPath: string): Promise<Error | null> {
     return this.writer.copyFile(sourcePath, destinationPath)
   }
 
   /**
    * Move file
    */
-  async moveFile(
-    sourcePath: string,
-    destinationPath: string,
-  ): Promise<Error | null> {
+  async moveFile(sourcePath: string, destinationPath: string): Promise<Error | null> {
     return this.writer.moveFile(sourcePath, destinationPath)
   }
 

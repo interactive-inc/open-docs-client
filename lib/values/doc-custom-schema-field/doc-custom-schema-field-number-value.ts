@@ -1,9 +1,5 @@
 import { zDocCustomSchemaFieldNumber, zDocMetaFieldNumber } from "@/models"
-import type {
-  DocCustomSchemaFieldNumber,
-  DocMetaFieldNumber,
-  RecordKey,
-} from "@/types"
+import type { DocCustomSchemaFieldNumber, DocMetaFieldNumber, RecordKey } from "@/types"
 
 export class DocCustomSchemaFieldNumberValue<K extends RecordKey> {
   constructor(
@@ -14,10 +10,7 @@ export class DocCustomSchemaFieldNumberValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    required: boolean,
-  ): DocCustomSchemaFieldNumberValue<K> {
+  static from<K extends RecordKey>(key: K, required: boolean): DocCustomSchemaFieldNumberValue<K> {
     return new DocCustomSchemaFieldNumberValue<K>(key, {
       type: "number",
       required,
@@ -29,9 +22,7 @@ export class DocCustomSchemaFieldNumberValue<K extends RecordKey> {
       return zDocMetaFieldNumber.parse(value)
     } catch {
       if (this.value.required) {
-        throw new Error(
-          `required field "${this.key.toString()}" is missing or invalid`,
-        )
+        throw new Error(`required field "${this.key.toString()}" is missing or invalid`)
       }
       return DocCustomSchemaFieldNumberValue.defaultValue()
     }

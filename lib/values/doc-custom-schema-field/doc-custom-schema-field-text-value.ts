@@ -1,9 +1,5 @@
 import { zDocCustomSchemaFieldText, zDocMetaFieldText } from "@/models"
-import type {
-  DocCustomSchemaFieldText,
-  DocMetaFieldText,
-  RecordKey,
-} from "@/types"
+import type { DocCustomSchemaFieldText, DocMetaFieldText, RecordKey } from "@/types"
 
 export class DocCustomSchemaFieldTextValue<K extends RecordKey> {
   constructor(
@@ -14,10 +10,7 @@ export class DocCustomSchemaFieldTextValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    required: boolean,
-  ): DocCustomSchemaFieldTextValue<K> {
+  static from<K extends RecordKey>(key: K, required: boolean): DocCustomSchemaFieldTextValue<K> {
     return new DocCustomSchemaFieldTextValue<K>(key, {
       type: "text",
       required,
@@ -29,9 +22,7 @@ export class DocCustomSchemaFieldTextValue<K extends RecordKey> {
       return zDocMetaFieldText.parse(value)
     } catch {
       if (this.value.required) {
-        throw new Error(
-          `required field "${this.key.toString()}" is missing or invalid`,
-        )
+        throw new Error(`required field "${this.key.toString()}" is missing or invalid`)
       }
       return DocCustomSchemaFieldTextValue.defaultValue()
     }

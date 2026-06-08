@@ -73,9 +73,7 @@ export class DocFileIndexMetaValue<T extends DocCustomSchema> {
    * Return a new instance with an unknown schema
    * Allows accepting Record<string, unknown> schemas from external sources
    */
-  withUnknownSchema(
-    draft: Record<string, unknown>,
-  ): DocFileIndexMetaValue<DocCustomSchema> {
+  withUnknownSchema(draft: Record<string, unknown>): DocFileIndexMetaValue<DocCustomSchema> {
     // Cast the unknown schema to the expected type
     const typedSchema = draft as DocFileIndexSchema<string>
 
@@ -145,10 +143,7 @@ export class DocFileIndexMetaValue<T extends DocCustomSchema> {
   ): DocFileIndexMetaValue<T> {
     const icon = DocFileIndexMetaValue.extractIcon(record, config)
 
-    const indexSchema = DocFileIndexMetaValue.extractSchema<T>(
-      record,
-      customSchema,
-    )
+    const indexSchema = DocFileIndexMetaValue.extractSchema<T>(record, customSchema)
 
     // Extract additional properties specified in indexMetaIncludes
     const additionalProperties: Record<string, unknown> = {}
@@ -164,12 +159,7 @@ export class DocFileIndexMetaValue<T extends DocCustomSchema> {
       schema: indexSchema,
     }
 
-    return new DocFileIndexMetaValue<T>(
-      indexMeta,
-      customSchema,
-      config,
-      additionalProperties,
-    )
+    return new DocFileIndexMetaValue<T>(indexMeta, customSchema, config, additionalProperties)
   }
 
   /**
@@ -191,9 +181,7 @@ export class DocFileIndexMetaValue<T extends DocCustomSchema> {
     )
   }
 
-  static emptySchema<T extends DocCustomSchema>(
-    customSchema: T,
-  ): DocFileIndexSchema<keyof T> {
+  static emptySchema<T extends DocCustomSchema>(customSchema: T): DocFileIndexSchema<keyof T> {
     const record = {} as DocFileIndexSchema<keyof T>
 
     const customSchemaKeys = Object.keys(customSchema) as Array<keyof T>

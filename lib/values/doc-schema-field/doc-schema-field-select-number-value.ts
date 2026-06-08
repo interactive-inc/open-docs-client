@@ -1,8 +1,4 @@
-import type {
-  DocFileIndexSchemaField,
-  DocSchemaFieldSelectNumber,
-  RecordKey,
-} from "@/types"
+import type { DocFileIndexSchemaField, DocSchemaFieldSelectNumber, RecordKey } from "@/types"
 
 /**
  * Single select number type schema field
@@ -60,9 +56,7 @@ export class DocSchemaFieldSelectNumberValue<T extends RecordKey> {
     return { ...this.value }
   }
 
-  static empty<T extends RecordKey>(
-    key: T,
-  ): DocSchemaFieldSelectNumberValue<T> {
+  static empty<T extends RecordKey>(key: T): DocSchemaFieldSelectNumberValue<T> {
     return new DocSchemaFieldSelectNumberValue(key, {
       type: "select-number",
       required: false,

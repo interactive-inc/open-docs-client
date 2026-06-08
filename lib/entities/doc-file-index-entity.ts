@@ -33,11 +33,7 @@ export class DocFileIndexEntity<T extends DocCustomSchema> {
    * Content
    */
   get content(): DocFileIndexContentValue<T> {
-    return new DocFileIndexContentValue<T>(
-      this.value.content,
-      this.customSchema,
-      this.config,
-    )
+    return new DocFileIndexContentValue<T>(this.value.content, this.customSchema, this.config)
   }
 
   /**
@@ -52,14 +48,10 @@ export class DocFileIndexEntity<T extends DocCustomSchema> {
    */
   withContent(content: DocFileIndexContentValue<T>): DocFileIndexEntity<T>
 
-  withContent(
-    updater: UpdateFunction<DocFileIndexContentValue<T>>,
-  ): DocFileIndexEntity<T>
+  withContent(updater: UpdateFunction<DocFileIndexContentValue<T>>): DocFileIndexEntity<T>
 
   withContent(
-    contentOrUpdater:
-      | DocFileIndexContentValue<T>
-      | UpdateFunction<DocFileIndexContentValue<T>>,
+    contentOrUpdater: DocFileIndexContentValue<T> | UpdateFunction<DocFileIndexContentValue<T>>,
   ): DocFileIndexEntity<T> {
     if (typeof contentOrUpdater === "function") {
       const updatedContent = contentOrUpdater(this.content)
@@ -83,9 +75,7 @@ export class DocFileIndexEntity<T extends DocCustomSchema> {
 
   withPath(updater: UpdateFunction<DocFilePath>): DocFileIndexEntity<T>
 
-  withPath(
-    pathOrUpdater: DocFilePath | UpdateFunction<DocFilePath>,
-  ): DocFileIndexEntity<T> {
+  withPath(pathOrUpdater: DocFilePath | UpdateFunction<DocFilePath>): DocFileIndexEntity<T> {
     if (typeof pathOrUpdater === "function") {
       const updatedPath = pathOrUpdater(this.path)
       return new DocFileIndexEntity<T>(

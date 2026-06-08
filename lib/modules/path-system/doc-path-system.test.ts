@@ -4,9 +4,7 @@ import { DocPathSystem } from "./doc-path-system"
 test("DocPathSystem - join: パスを結合", () => {
   const system = new DocPathSystem()
 
-  expect(system.join("docs", "products", "index.md")).toBe(
-    "docs/products/index.md",
-  )
+  expect(system.join("docs", "products", "index.md")).toBe("docs/products/index.md")
   expect(system.join("/docs", "products")).toBe("/docs/products")
   expect(system.join("docs/", "/products")).toBe("docs/products")
   expect(system.join("", "docs", "", "index.md")).toBe("docs/index.md")
@@ -55,12 +53,8 @@ test("DocPathSystem - relative: 相対パスを計算", () => {
 test("DocPathSystem - resolve: 絶対パスに変換", () => {
   const system = new DocPathSystem()
 
-  expect(system.resolve("/docs", "products", "index.md")).toBe(
-    "/docs/products/index.md",
-  )
-  expect(system.resolve("docs", "/products", "index.md")).toBe(
-    "/products/index.md",
-  )
+  expect(system.resolve("/docs", "products", "index.md")).toBe("/docs/products/index.md")
+  expect(system.resolve("docs", "/products", "index.md")).toBe("/products/index.md")
   expect(system.resolve("", "docs")).toBe("docs")
   expect(system.resolve()).toBe(".")
 })
@@ -68,9 +62,7 @@ test("DocPathSystem - resolve: 絶対パスに変換", () => {
 test("DocPathSystem - normalize: パスを正規化", () => {
   const system = new DocPathSystem()
 
-  expect(system.normalize("docs//products/../features/./index.md")).toBe(
-    "docs/features/index.md",
-  )
+  expect(system.normalize("docs//products/../features/./index.md")).toBe("docs/features/index.md")
   expect(system.normalize("/docs/../products")).toBe("/products")
   expect(system.normalize("../docs/./products")).toBe("../docs/products")
   expect(system.normalize("./docs")).toBe("docs")

@@ -52,11 +52,7 @@ test("DocFilePathValue - 拡張子のないファイル", () => {
 
 test("DocFilePathValue - fromPathWithSystemで相対パスから生成", () => {
   const pathSystem = new DocPathSystem()
-  const value = DocFilePathValue.fromPathWithSystem(
-    "docs/test.md",
-    pathSystem,
-    "/Users/project",
-  )
+  const value = DocFilePathValue.fromPathWithSystem("docs/test.md", pathSystem, "/Users/project")
 
   expect(value.path).toBe("docs/test.md")
   expect(value.name).toBe("test")
@@ -80,11 +76,7 @@ test("DocFilePathValue - fromPathWithSystemでindex.mdの場合", () => {
 
 test("DocFilePathValue - fromPathWithSystemでルートのindex.mdの場合", () => {
   const pathSystem = new DocPathSystem()
-  const value = DocFilePathValue.fromPathWithSystem(
-    "index.md",
-    pathSystem,
-    "/Users/project",
-  )
+  const value = DocFilePathValue.fromPathWithSystem("index.md", pathSystem, "/Users/project")
 
   expect(value.path).toBe("index.md")
   expect(value.name).toBe("index")

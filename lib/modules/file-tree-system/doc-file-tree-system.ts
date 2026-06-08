@@ -30,8 +30,7 @@ export class DocFileTreeSystem {
    * Build file tree recursively
    */
   async buildFileTree(directoryPath = ""): Promise<DocTreeNodeValue[] | Error> {
-    const fileNames =
-      await this.props.fileSystem.readDirectoryFileNames(directoryPath)
+    const fileNames = await this.props.fileSystem.readDirectoryFileNames(directoryPath)
 
     if (fileNames instanceof Error) {
       return fileNames
@@ -148,9 +147,7 @@ export class DocFileTreeSystem {
   /**
    * Create index file reference
    */
-  private createIndexFileReference(
-    directoryPath: string,
-  ): DocFileIndexReference<DocCustomSchema> {
+  private createIndexFileReference(directoryPath: string): DocFileIndexReference<DocCustomSchema> {
     const indexPath =
       directoryPath === ""
         ? this.props.indexFileName
@@ -168,9 +165,7 @@ export class DocFileTreeSystem {
   /**
    * Create MD file reference
    */
-  private createMdFileReference(
-    path: string,
-  ): DocFileMdReference<DocCustomSchema> {
+  private createMdFileReference(path: string): DocFileMdReference<DocCustomSchema> {
     return new DocFileMdReference({
       path,
       fileSystem: this.props.fileSystem,
@@ -183,11 +178,8 @@ export class DocFileTreeSystem {
   /**
    * Build directory tree recursively (directories only)
    */
-  async buildDirectoryTree(
-    directoryPath = "",
-  ): Promise<DocTreeDirectoryNodeValue[] | Error> {
-    const fileNames =
-      await this.props.fileSystem.readDirectoryFileNames(directoryPath)
+  async buildDirectoryTree(directoryPath = ""): Promise<DocTreeDirectoryNodeValue[] | Error> {
+    const fileNames = await this.props.fileSystem.readDirectoryFileNames(directoryPath)
 
     if (fileNames instanceof Error) {
       return fileNames
@@ -210,10 +202,7 @@ export class DocFileTreeSystem {
         : fileName
       const isDirectory = await this.props.fileSystem.isDirectory(filePath)
       if (!isDirectory) continue
-      const directoryNode = await this.createDirectoryNodeForTree(
-        fileName,
-        filePath,
-      )
+      const directoryNode = await this.createDirectoryNodeForTree(fileName, filePath)
       if (directoryNode instanceof Error) {
         return directoryNode
       }
@@ -243,11 +232,7 @@ export class DocFileTreeSystem {
       title = entity.value.content.title || fileName
       const content = entity.content
       const frontMatter = content.meta()
-      if (
-        frontMatter &&
-        typeof frontMatter === "object" &&
-        "icon" in frontMatter
-      ) {
+      if (frontMatter && typeof frontMatter === "object" && "icon" in frontMatter) {
         icon = frontMatter.icon || this.config.defaultIndexIcon
       }
     }

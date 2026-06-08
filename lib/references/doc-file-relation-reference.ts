@@ -43,10 +43,7 @@ export class DocFileRelationReference {
    * Full path
    */
   get fullPath(): string {
-    return this.pathSystem.join(
-      this.fileSystem.getBasePath(),
-      this.props.filePath,
-    )
+    return this.pathSystem.join(this.fileSystem.getBasePath(), this.props.filePath)
   }
 
   async read(): Promise<DocRelationValue | Error | null> {
@@ -98,9 +95,7 @@ export class DocFileRelationReference {
   /**
    * Read single relation file
    */
-  async readFile(
-    filePath: string,
-  ): Promise<DocRelationFileValue | Error | null> {
+  async readFile(filePath: string): Promise<DocRelationFileValue | Error | null> {
     if (filePath.includes("index.md")) {
       return null
     }
@@ -122,11 +117,7 @@ export class DocFileRelationReference {
 
     const contentValue = DocFileMdContentValue.fromMarkdown(content, {})
 
-    const pathValue = DocFilePathValue.fromPathWithSystem(
-      filePath,
-      this.pathSystem,
-      this.basePath,
-    )
+    const pathValue = DocFilePathValue.fromPathWithSystem(filePath, this.pathSystem, this.basePath)
 
     const fileEntity = new DocFileMdEntity(
       {

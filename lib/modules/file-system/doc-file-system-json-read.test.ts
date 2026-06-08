@@ -5,8 +5,7 @@ describe("DocFileSystemJsonRead", () => {
   // サンプルJSONデータ
   const sampleJsonData = {
     "README.md": "# Project Title\n\nThis is the main README file.",
-    "docs/getting-started.md":
-      "# Getting Started\n\nWelcome to the documentation.",
+    "docs/getting-started.md": "# Getting Started\n\nWelcome to the documentation.",
     "docs/api/index.md": "# API Reference\n\nAPI documentation here.",
     "docs/api/authentication.md": "# Authentication\n\nHow to authenticate.",
     "docs/guides/tutorial.md": "# Tutorial\n\nStep by step tutorial.",
@@ -83,24 +82,18 @@ describe("DocFileSystemJsonRead", () => {
     })
 
     test("should get file name from path", () => {
-      expect(fileSystem.readFileName("docs/getting-started.md")).toBe(
-        "getting-started.md",
-      )
+      expect(fileSystem.readFileName("docs/getting-started.md")).toBe("getting-started.md")
       expect(fileSystem.readFileName("README.md")).toBe("README.md")
     })
 
     test("should get file extension from path", () => {
-      expect(fileSystem.readFileExtension("docs/getting-started.md")).toBe(
-        ".md",
-      )
+      expect(fileSystem.readFileExtension("docs/getting-started.md")).toBe(".md")
       expect(fileSystem.readFileExtension("src/index.ts")).toBe(".ts")
       expect(fileSystem.readFileExtension("package.json")).toBe(".json")
     })
 
     test("should get directory path from file path", () => {
-      expect(fileSystem.readFileDirectory("docs/getting-started.md")).toBe(
-        "docs",
-      )
+      expect(fileSystem.readFileDirectory("docs/getting-started.md")).toBe("docs")
       expect(fileSystem.readFileDirectory("README.md")).toBe(".")
       expect(fileSystem.readFileDirectory("docs/api/index.md")).toBe("docs/api")
     })
@@ -128,11 +121,7 @@ describe("DocFileSystemJsonRead", () => {
 
     test("should read directory file paths", async () => {
       const filePaths = await fileSystem.readDirectoryFilePaths("docs")
-      expect(filePaths).toEqual([
-        "docs/api",
-        "docs/getting-started.md",
-        "docs/guides",
-      ])
+      expect(filePaths).toEqual(["docs/api", "docs/getting-started.md", "docs/guides"])
     })
 
     test("should return empty array for non-existing directory", async () => {
@@ -189,9 +178,7 @@ describe("DocFileSystemJsonRead", () => {
       })
 
       expect(fileSystem.resolve("README.md")).toBe("/project/README.md")
-      expect(fileSystem.resolve("docs/api/index.md")).toBe(
-        "/project/docs/api/index.md",
-      )
+      expect(fileSystem.resolve("docs/api/index.md")).toBe("/project/docs/api/index.md")
     })
 
     test("should resolve with default base path", () => {
@@ -200,9 +187,7 @@ describe("DocFileSystemJsonRead", () => {
       })
 
       expect(fileSystem.resolve("README.md")).toBe("docs/README.md")
-      expect(fileSystem.resolve("docs/api/index.md")).toBe(
-        "docs/docs/api/index.md",
-      )
+      expect(fileSystem.resolve("docs/api/index.md")).toBe("docs/docs/api/index.md")
     })
   })
 
@@ -214,10 +199,7 @@ describe("DocFileSystemJsonRead", () => {
     test("should get file size in bytes", async () => {
       const size = await fileSystem.getFileSize("README.md")
       expect(size).toBe(
-        Buffer.byteLength(
-          "# Project Title\n\nThis is the main README file.",
-          "utf8",
-        ),
+        Buffer.byteLength("# Project Title\n\nThis is the main README file.", "utf8"),
       )
     })
 
@@ -298,9 +280,7 @@ describe("DocFileSystemJsonRead", () => {
         data: complexData,
       })
 
-      expect(await fileSystem.readFile("a/b/c/d/e/file.md")).toBe(
-        "Deep nested file",
-      )
+      expect(await fileSystem.readFile("a/b/c/d/e/file.md")).toBe("Deep nested file")
       expect(await fileSystem.isDirectory("a")).toBe(true)
       expect(await fileSystem.isDirectory("a/b")).toBe(true)
       expect(await fileSystem.isDirectory("a/b/c")).toBe(true)

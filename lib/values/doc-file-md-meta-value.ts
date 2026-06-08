@@ -83,9 +83,7 @@ export class DocFileMdMetaValue<T extends DocCustomSchema> {
     return field
   }
 
-  field<K extends keyof T>(
-    key: K,
-  ): FieldValueType<ExtractFieldType<T[K]>, ExtractRequired<T[K]>> {
+  field<K extends keyof T>(key: K): FieldValueType<ExtractFieldType<T[K]>, ExtractRequired<T[K]>> {
     const schemaField = this.schemaField(key)
 
     const hasKey = key in this.value
@@ -95,10 +93,7 @@ export class DocFileMdMetaValue<T extends DocCustomSchema> {
     }
 
     if (hasKey === false) {
-      return null as FieldValueType<
-        ExtractFieldType<T[K]>,
-        ExtractRequired<T[K]>
-      >
+      return null as FieldValueType<ExtractFieldType<T[K]>, ExtractRequired<T[K]>>
     }
 
     const value = this.getValueField(this.value, key)
@@ -109,10 +104,7 @@ export class DocFileMdMetaValue<T extends DocCustomSchema> {
 
     const nullable = field.value ?? null
 
-    return nullable as FieldValueType<
-      ExtractFieldType<T[K]>,
-      ExtractRequired<T[K]>
-    >
+    return nullable as FieldValueType<ExtractFieldType<T[K]>, ExtractRequired<T[K]>>
   }
 
   relation(key: keyof T): DocMetaFieldRelation {
@@ -239,15 +231,10 @@ export class DocFileMdMetaValue<T extends DocCustomSchema> {
       validatedRecord[key as string] = value
     }
 
-    return new DocFileMdMetaValue(
-      validatedRecord as SchemaToValueType<T>,
-      customSchema,
-    )
+    return new DocFileMdMetaValue(validatedRecord as SchemaToValueType<T>, customSchema)
   }
 
-  static empty<T extends DocCustomSchema>(
-    customSchema: T,
-  ): DocFileMdMetaValue<T> {
+  static empty<T extends DocCustomSchema>(customSchema: T): DocFileMdMetaValue<T> {
     const record = {} as SchemaToValueType<T>
 
     const customSchemaKeys = Object.keys(customSchema) as Array<keyof T>

@@ -1,7 +1,4 @@
-import {
-  zDocCustomSchemaFieldMultiSelectText,
-  zDocMetaFieldMultiSelectText,
-} from "@/models"
+import { zDocCustomSchemaFieldMultiSelectText, zDocMetaFieldMultiSelectText } from "@/models"
 import type {
   DocCustomSchemaFieldMultiSelectText,
   DocMetaFieldMultiSelectText,
@@ -32,9 +29,7 @@ export class DocCustomSchemaFieldMultiSelectTextValue<K extends RecordKey> {
       return zDocMetaFieldMultiSelectText.parse(value)
     } catch {
       if (this.value.required) {
-        throw new Error(
-          `required field "${this.key.toString()}" is missing or invalid`,
-        )
+        throw new Error(`required field "${this.key.toString()}" is missing or invalid`)
       }
       return DocCustomSchemaFieldMultiSelectTextValue.defaultValue()
     }

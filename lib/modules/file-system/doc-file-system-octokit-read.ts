@@ -54,9 +54,7 @@ export class DocFileSystemOctokitRead implements DocFileSystemReadInterface {
       })
 
       if ("type" in response.data && response.data.type === "file") {
-        const content = Buffer.from(response.data.content, "base64").toString(
-          "utf-8",
-        )
+        const content = Buffer.from(response.data.content, "base64").toString("utf-8")
 
         this.fileCache.set(fullPath, {
           sha: response.data.sha,
@@ -69,17 +67,10 @@ export class DocFileSystemOctokitRead implements DocFileSystemReadInterface {
 
       return new Error(`Path ${relativePath} is not a file`)
     } catch (error: unknown) {
-      if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        error.status === 404
-      ) {
+      if (error && typeof error === "object" && "status" in error && error.status === 404) {
         return null
       }
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to read file at ${relativePath}`)
+      return error instanceof Error ? error : new Error(`Failed to read file at ${relativePath}`)
     }
   }
 
@@ -134,9 +125,7 @@ export class DocFileSystemOctokitRead implements DocFileSystemReadInterface {
   /**
    * Get list of file paths in directory
    */
-  async readDirectoryFilePaths(
-    relativePath: string,
-  ): Promise<string[] | Error> {
+  async readDirectoryFilePaths(relativePath: string): Promise<string[] | Error> {
     try {
       const fileNames = await this.readDirectoryFileNames(relativePath)
 
@@ -144,9 +133,7 @@ export class DocFileSystemOctokitRead implements DocFileSystemReadInterface {
         return fileNames
       }
 
-      return fileNames.map((fileName) =>
-        this.pathSystem.join(relativePath, fileName),
-      )
+      return fileNames.map((fileName) => this.pathSystem.join(relativePath, fileName))
     } catch (error) {
       return error instanceof Error
         ? error

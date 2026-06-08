@@ -31,9 +31,7 @@ export class DocFileSystemNodeRead implements DocFileSystemReadInterface {
       const fullPath = this.pathSystem.join(this.basePath, relativePath)
       return await fs.readFile(fullPath, "utf-8")
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to read file at ${relativePath}`)
+      return error instanceof Error ? error : new Error(`Failed to read file at ${relativePath}`)
     }
   }
 
@@ -72,9 +70,7 @@ export class DocFileSystemNodeRead implements DocFileSystemReadInterface {
     }
   }
 
-  async readDirectoryFilePaths(
-    relativePath: string,
-  ): Promise<string[] | Error> {
+  async readDirectoryFilePaths(relativePath: string): Promise<string[] | Error> {
     try {
       const fileNames = await this.readDirectoryFileNames(relativePath)
 
@@ -82,9 +78,7 @@ export class DocFileSystemNodeRead implements DocFileSystemReadInterface {
         return fileNames
       }
 
-      return fileNames.map((fileName) =>
-        this.pathSystem.join(relativePath, fileName),
-      )
+      return fileNames.map((fileName) => this.pathSystem.join(relativePath, fileName))
     } catch (error) {
       return error instanceof Error
         ? error

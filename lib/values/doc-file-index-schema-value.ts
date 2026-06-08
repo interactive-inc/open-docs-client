@@ -130,9 +130,7 @@ export class DocFileIndexSchemaValue<T extends DocCustomSchema> {
     return new DocSchemaFieldRelationValue(key, fieldValue)
   }
 
-  multiRelation<K extends keyof T>(
-    key: K,
-  ): DocSchemaFieldMultiRelationValue<K> {
+  multiRelation<K extends keyof T>(key: K): DocSchemaFieldMultiRelationValue<K> {
     const fieldValue = this.value[key]
     if (!fieldValue) {
       throw new Error(`Field "${key as string}" not found in schema`)

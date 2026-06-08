@@ -40,10 +40,7 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
   /**
    * Write content to file in GitHub repository
    */
-  async writeFile(
-    relativePath: string,
-    content: string,
-  ): Promise<Error | null> {
+  async writeFile(relativePath: string, content: string): Promise<Error | null> {
     try {
       const fullPath = this.pathSystem.join(this.basePath, relativePath)
       const encodedContent = Buffer.from(content).toString("base64")
@@ -51,9 +48,7 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
 
       // Try to get SHA from reader cache if it's an OctokitRead instance
       if (this.reader && "getCachedSha" in this.reader) {
-        sha = (this.reader as DocFileSystemOctokitRead).getCachedSha(
-          relativePath,
-        )
+        sha = (this.reader as DocFileSystemOctokitRead).getCachedSha(relativePath)
       }
 
       // If not cached, try to get existing file SHA
@@ -85,9 +80,7 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
 
       return null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to write file at ${relativePath}`)
+      return error instanceof Error ? error : new Error(`Failed to write file at ${relativePath}`)
     }
   }
 
@@ -101,9 +94,7 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
 
       // Try to get SHA from reader cache if it's an OctokitRead instance
       if (this.reader && "getCachedSha" in this.reader) {
-        sha = (this.reader as DocFileSystemOctokitRead).getCachedSha(
-          relativePath,
-        )
+        sha = (this.reader as DocFileSystemOctokitRead).getCachedSha(relativePath)
       }
 
       // If not cached, get from API
@@ -134,9 +125,7 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
 
       return null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to delete file at ${relativePath}`)
+      return error instanceof Error ? error : new Error(`Failed to delete file at ${relativePath}`)
     }
   }
 
@@ -177,10 +166,7 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
   /**
    * Copy file to new location
    */
-  async copyFile(
-    sourcePath: string,
-    destinationPath: string,
-  ): Promise<Error | null> {
+  async copyFile(sourcePath: string, destinationPath: string): Promise<Error | null> {
     try {
       if (!this.reader) {
         return new Error("Reader is required for copy operation")
@@ -198,19 +184,14 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
     } catch (error) {
       return error instanceof Error
         ? error
-        : new Error(
-            `Failed to copy file from ${sourcePath} to ${destinationPath}`,
-          )
+        : new Error(`Failed to copy file from ${sourcePath} to ${destinationPath}`)
     }
   }
 
   /**
    * Move file to new location
    */
-  async moveFile(
-    sourcePath: string,
-    destinationPath: string,
-  ): Promise<Error | null> {
+  async moveFile(sourcePath: string, destinationPath: string): Promise<Error | null> {
     try {
       const copyResult = await this.copyFile(sourcePath, destinationPath)
       if (copyResult !== null) {
@@ -221,9 +202,7 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
     } catch (error) {
       return error instanceof Error
         ? error
-        : new Error(
-            `Failed to move file from ${sourcePath} to ${destinationPath}`,
-          )
+        : new Error(`Failed to move file from ${sourcePath} to ${destinationPath}`)
     }
   }
 }

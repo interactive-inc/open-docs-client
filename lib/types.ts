@@ -73,9 +73,7 @@ export type DocSchemaFieldMultiText = z.infer<typeof zDocSchemaFieldMultiText>
 /**
  * Multi-number field type
  */
-export type DocSchemaFieldMultiNumber = z.infer<
-  typeof zDocSchemaFieldMultiNumber
->
+export type DocSchemaFieldMultiNumber = z.infer<typeof zDocSchemaFieldMultiNumber>
 
 /**
  * Relation field type
@@ -85,9 +83,7 @@ export type DocSchemaFieldRelation = z.infer<typeof zDocSchemaFieldRelation>
 /**
  * Multi-relation field type
  */
-export type DocSchemaFieldMultiRelation = z.infer<
-  typeof zDocSchemaFieldMultiRelation
->
+export type DocSchemaFieldMultiRelation = z.infer<typeof zDocSchemaFieldMultiRelation>
 
 /**
  * Select text field type
@@ -97,23 +93,17 @@ export type DocSchemaFieldSelectText = z.infer<typeof zDocSchemaFieldSelectText>
 /**
  * Select number field type
  */
-export type DocSchemaFieldSelectNumber = z.infer<
-  typeof zDocSchemaFieldSelectNumber
->
+export type DocSchemaFieldSelectNumber = z.infer<typeof zDocSchemaFieldSelectNumber>
 
 /**
  * Multi-select text field type
  */
-export type DocSchemaFieldMultiSelectText = z.infer<
-  typeof zDocSchemaFieldMultiSelectText
->
+export type DocSchemaFieldMultiSelectText = z.infer<typeof zDocSchemaFieldMultiSelectText>
 
 /**
  * Multi-select number field type
  */
-export type DocSchemaFieldMultiSelectNumber = z.infer<
-  typeof zDocSchemaFieldMultiSelectNumber
->
+export type DocSchemaFieldMultiSelectNumber = z.infer<typeof zDocSchemaFieldMultiSelectNumber>
 
 export type DocMetaField = z.infer<typeof zDocMetaField>
 
@@ -133,17 +123,11 @@ export type DocMetaFieldMultiText = z.infer<typeof zDocMetaFieldMultiText>
 
 export type DocMetaFieldMultiNumber = z.infer<typeof zDocMetaFieldMultiNumber>
 
-export type DocMetaFieldMultiSelectText = z.infer<
-  typeof zDocMetaFieldMultiSelectText
->
+export type DocMetaFieldMultiSelectText = z.infer<typeof zDocMetaFieldMultiSelectText>
 
-export type DocMetaFieldMultiSelectNumber = z.infer<
-  typeof zDocMetaFieldMultiSelectNumber
->
+export type DocMetaFieldMultiSelectNumber = z.infer<typeof zDocMetaFieldMultiSelectNumber>
 
-export type DocMetaFieldMultiRelation = z.infer<
-  typeof zDocMetaFieldMultiRelation
->
+export type DocMetaFieldMultiRelation = z.infer<typeof zDocMetaFieldMultiRelation>
 
 export type DocFileMdMeta<T extends RecordKey> = Record<T, DocMetaField>
 
@@ -155,13 +139,9 @@ export type DocMetaFieldTypeNumber = z.infer<typeof zDocMetaFieldTypeNumber>
 
 export type DocMetaFieldTypeBoolean = z.infer<typeof zDocMetaFieldTypeBoolean>
 
-export type DocMetaFieldTypeSelectText = z.infer<
-  typeof zDocMetaFieldTypeSelectText
->
+export type DocMetaFieldTypeSelectText = z.infer<typeof zDocMetaFieldTypeSelectText>
 
-export type DocMetaFieldTypeSelectNumber = z.infer<
-  typeof zDocMetaFieldTypeSelectNumber
->
+export type DocMetaFieldTypeSelectNumber = z.infer<typeof zDocMetaFieldTypeSelectNumber>
 
 export type DocMetaFieldTypeRelation = z.infer<typeof zDocMetaFieldTypeRelation>
 
@@ -233,10 +213,7 @@ export type DocFileIndexSchemaField = z.infer<typeof zDocFileIndexSchemaField>
 /**
  * Schema definition type
  */
-export type DocFileIndexSchema<T extends RecordKey = string> = Record<
-  T,
-  DocFileIndexSchemaField
->
+export type DocFileIndexSchema<T extends RecordKey = string> = Record<T, DocFileIndexSchemaField>
 
 /**
  * Schema field to override
@@ -274,17 +251,12 @@ export type DocFieldTypeLiteral =
 /**
  * Minimal schema definition type
  */
-export type DocCustomSchema<T extends RecordKey = string> = Record<
-  T,
-  DocCustomSchemaField
->
+export type DocCustomSchema<T extends RecordKey = string> = Record<T, DocCustomSchemaField>
 
 /**
  * Union type for relation fields
  */
-export type DocSchemaRelationFieldUnion =
-  | DocSchemaFieldRelation
-  | DocSchemaFieldMultiRelation
+export type DocSchemaRelationFieldUnion = DocSchemaFieldRelation | DocSchemaFieldMultiRelation
 
 /**
  * File node type (for files only)
@@ -327,11 +299,8 @@ export type DocFileIndex<T extends DocCustomSchema = DocCustomSchema> = {
 /**
  * Type to check if two types are equal
  */
-export type Equals<T, U> = (<G>() => G extends T ? 1 : 2) extends <
-  G,
->() => G extends U ? 1 : 2
-  ? true
-  : false
+export type Equals<T, U> =
+  (<G>() => G extends T ? 1 : 2) extends <G>() => G extends U ? 1 : 2 ? true : false
 
 /**
  * Extract relation field keys from schema
@@ -414,16 +383,12 @@ export type DocRelationField = z.infer<typeof zDocRelationField>
 /**
  * Check if path ends with specific extension
  */
-type EndsWith<T extends string, U extends string> = T extends `${string}${U}`
-  ? true
-  : false
+type EndsWith<T extends string, U extends string> = T extends `${string}${U}` ? true : false
 
 /**
  * Extract filename from path
  */
-type Basename<T extends string> = T extends `${string}/${infer U}`
-  ? Basename<U>
-  : T
+type Basename<T extends string> = T extends `${string}/${infer U}` ? Basename<U> : T
 
 /**
  * Check if filename is index.md
@@ -433,11 +398,8 @@ type IsIndexMd<T extends string> = Basename<T> extends "index.md" ? true : false
 /**
  * Detect file type from path
  */
-export type DetectFileType<T extends string> = IsIndexMd<T> extends true
-  ? "index"
-  : EndsWith<T, ".md"> extends true
-    ? "markdown"
-    : "unknown"
+export type DetectFileType<T extends string> =
+  IsIndexMd<T> extends true ? "index" : EndsWith<T, ".md"> extends true ? "markdown" : "unknown"
 
 /**
  * Map file type to reference class
@@ -513,9 +475,7 @@ export type DocDirectoryMeta = z.infer<typeof zDocDirectoryMeta>
  */
 export type ExtractFieldType<T> = T extends { type: infer Type } ? Type : never
 
-export type ExtractRequired<T> = T extends { required: infer Required }
-  ? Required
-  : false
+export type ExtractRequired<T> = T extends { required: infer Required } ? Required : false
 
 export type BaseFieldValueType<Type> = Type extends "text"
   ? string
@@ -573,12 +533,10 @@ export type SchemaToValueType<T extends DocCustomSchema> = {
 /**
  * Helper type for type-safe property access
  */
-export type GetValueType<
-  T extends DocCustomSchema,
-  K extends keyof T,
-> = K extends RequiredKeys<T>
-  ? BaseFieldValueType<ExtractFieldType<T[K]>>
-  : BaseFieldValueType<ExtractFieldType<T[K]>> | undefined | null
+export type GetValueType<T extends DocCustomSchema, K extends keyof T> =
+  K extends RequiredKeys<T>
+    ? BaseFieldValueType<ExtractFieldType<T[K]>>
+    : BaseFieldValueType<ExtractFieldType<T[K]>> | undefined | null
 
 export type GetIndexFieldType<
   Schema extends DocFileIndexSchema<RecordKey>,

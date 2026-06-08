@@ -15,19 +15,14 @@ export class DocMetaFieldMultiSelectNumberValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    value: unknown,
-  ): DocMetaFieldMultiSelectNumberValue<K> {
+  static from<K extends RecordKey>(key: K, value: unknown): DocMetaFieldMultiSelectNumberValue<K> {
     return new DocMetaFieldMultiSelectNumberValue<K>(
       key,
       zDocMetaFieldMultiSelectNumber.parse(value),
     )
   }
 
-  static default<K extends RecordKey>(
-    key: K,
-  ): DocMetaFieldMultiSelectNumberValue<K> {
+  static default<K extends RecordKey>(key: K): DocMetaFieldMultiSelectNumberValue<K> {
     return new DocMetaFieldMultiSelectNumberValue(key, [])
   }
 

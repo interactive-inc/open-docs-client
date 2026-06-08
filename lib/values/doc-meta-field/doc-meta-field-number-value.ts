@@ -15,10 +15,7 @@ export class DocMetaFieldNumberValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    value: unknown,
-  ): DocMetaFieldNumberValue<K> {
+  static from<K extends RecordKey>(key: K, value: unknown): DocMetaFieldNumberValue<K> {
     return new DocMetaFieldNumberValue<K>(key, zDocMetaFieldNumber.parse(value))
   }
 

@@ -42,9 +42,7 @@ export class DocFileUnknownEntity {
 
   withPath(updater: UpdateFunction<DocFilePath>): DocFileUnknownEntity
 
-  withPath(
-    pathOrUpdater: DocFilePath | UpdateFunction<DocFilePath>,
-  ): DocFileUnknownEntity {
+  withPath(pathOrUpdater: DocFilePath | UpdateFunction<DocFilePath>): DocFileUnknownEntity {
     if (typeof pathOrUpdater === "function") {
       const updatedPath = pathOrUpdater(this.path)
       return new DocFileUnknownEntity({

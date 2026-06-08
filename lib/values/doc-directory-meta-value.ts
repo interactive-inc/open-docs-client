@@ -30,10 +30,7 @@ export class DocDirectoryMetaValue {
   /**
    * Parse from JSON string
    */
-  static fromJson(
-    jsonText: string,
-    config: DocClientConfig,
-  ): DocDirectoryMetaValue | null {
+  static fromJson(jsonText: string, config: DocClientConfig): DocDirectoryMetaValue | null {
     const parsed = JSON.parse(jsonText)
     const result = zDocDirectoryMeta.safeParse(parsed)
 

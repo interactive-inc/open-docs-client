@@ -49,9 +49,7 @@ export class DocClient {
       metaFileName: ".meta.json",
     }
 
-    this.config = props.config
-      ? zDocClientConfig.parse(props.config)
-      : defaultConfig
+    this.config = props.config ? zDocClientConfig.parse(props.config) : defaultConfig
 
     const fileTreeSystem = new DocFileTreeSystem({
       fileSystem: this.fileSystem,
@@ -68,9 +66,7 @@ export class DocClient {
     return this.fileSystem.getBasePath()
   }
 
-  file<Path extends string>(
-    relativePath: Path,
-  ): InferReference<Path, DocCustomSchema>
+  file<Path extends string>(relativePath: Path): InferReference<Path, DocCustomSchema>
 
   file<Path extends string, T extends DocCustomSchema>(
     relativePath: Path,
@@ -80,10 +76,7 @@ export class DocClient {
   /**
    * Get file reference
    */
-  file<Path extends string, T extends DocCustomSchema>(
-    relativePath: Path,
-    customSchema?: T,
-  ) {
+  file<Path extends string, T extends DocCustomSchema>(relativePath: Path, customSchema?: T) {
     // Check if it's index.md
     const fileName = this.pathSystem.basename(relativePath)
     if (fileName === this.config.indexFileName) {
@@ -111,18 +104,13 @@ export class DocClient {
 
   mdFile(relativePath: string): DocFileMdReference<DocCustomSchema>
 
-  mdFile<T extends DocCustomSchema>(
-    relativePath: string,
-    customSchema: T,
-  ): DocFileMdReference<T>
+  mdFile<T extends DocCustomSchema>(relativePath: string, customSchema: T): DocFileMdReference<T>
 
   /**
    * Markdown file reference
    */
   mdFile<T extends DocCustomSchema>(relativePath: string, customSchema?: T) {
-    const normalizedPath = relativePath.endsWith(".md")
-      ? relativePath
-      : `${relativePath}.md`
+    const normalizedPath = relativePath.endsWith(".md") ? relativePath : `${relativePath}.md`
 
     if (customSchema === undefined) {
       return new DocFileMdReference<DocCustomSchema>({

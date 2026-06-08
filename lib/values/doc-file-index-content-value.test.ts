@@ -234,11 +234,7 @@ schema: {}
 
 本文の内容`
 
-  const value = DocFileIndexContentValue.fromMarkdown(
-    markdown,
-    {},
-    defaultTestConfig,
-  )
+  const value = DocFileIndexContentValue.fromMarkdown(markdown, {}, defaultTestConfig)
 
   expect(value.title).toBe("ドキュメントタイトル")
   expect(value.description).toBe("これは説明文です。")
@@ -247,11 +243,7 @@ schema: {}
 })
 
 test("DocFileContentIndexValue - emptyでデフォルトコンテンツを生成", () => {
-  const value = DocFileIndexContentValue.empty(
-    "テストディレクトリ",
-    {},
-    defaultTestConfig,
-  )
+  const value = DocFileIndexContentValue.empty("テストディレクトリ", {}, defaultTestConfig)
 
   expect(value.title).toBe("テストディレクトリ")
   expect(value.meta().icon).toBe("")

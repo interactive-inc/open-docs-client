@@ -53,9 +53,7 @@ test("updateFrontMatter - 型安全な更新", () => {
   }
 
   // 型レベルのテスト
-  type UpdateTest1 = Parameters<
-    DocFileMdReference<TestSchema>["updateFrontMatter"]
-  >
+  type UpdateTest1 = Parameters<DocFileMdReference<TestSchema>["updateFrontMatter"]>
   // 第1引数は TestSchema のキー
   type Key = UpdateTest1[0]
   assertType<Equals<Key, keyof TestSchema>>()
@@ -89,9 +87,7 @@ test("readFrontMatter メソッドの戻り値の型", () => {
   >
 
   // DocFileMdMetaValue<TestSchema> または Error
-  assertType<
-    Equals<ReadFrontMatterResult, DocFileMdMetaValue<TestSchema> | Error>
-  >()
+  assertType<Equals<ReadFrontMatterResult, DocFileMdMetaValue<TestSchema> | Error>>()
 })
 
 test("relation メソッドの型推論", () => {
@@ -102,14 +98,10 @@ test("relation メソッドの型推論", () => {
   }
 
   // relation メソッドの戻り値の型
-  type RelationResult = Awaited<
-    ReturnType<DocFileMdReference<TestSchema>["relation"]>
-  >
+  type RelationResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["relation"]>>
 
   // DocFileMdReference<DocCustomSchema> | Error | null (デフォルトのスキーマ)
-  assertType<
-    Equals<RelationResult, DocFileMdReference<DocCustomSchema> | Error | null>
-  >()
+  assertType<Equals<RelationResult, DocFileMdReference<DocCustomSchema> | Error | null>>()
 })
 
 test("relations メソッドの型推論", () => {
@@ -119,9 +111,7 @@ test("relations メソッドの型推論", () => {
   }
 
   // relations メソッドの戻り値の型
-  type RelationsResult = Awaited<
-    ReturnType<DocFileMdReference<TestSchema>["relations"]>
-  >
+  type RelationsResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["relations"]>>
 
   // DocFileMdReference<DocCustomSchema>[] (デフォルトのスキーマを持つ参照の配列)
   assertType<Equals<RelationsResult, DocFileMdReference<DocCustomSchema>[]>>()
@@ -133,9 +123,7 @@ test("directory メソッドの型推論", () => {
   }
 
   // directory メソッドの戻り値の型
-  type _DirectoryResult = ReturnType<
-    DocFileMdReference<TestSchema>["directory"]
-  >
+  type _DirectoryResult = ReturnType<DocFileMdReference<TestSchema>["directory"]>
 })
 
 test("directoryIndex メソッドの型推論", () => {
@@ -144,9 +132,7 @@ test("directoryIndex メソッドの型推論", () => {
   }
 
   // directoryIndex メソッドの戻り値の型
-  type _DirectoryIndexResult = Awaited<
-    ReturnType<DocFileMdReference<TestSchema>["directoryIndex"]>
-  >
+  type _DirectoryIndexResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["directoryIndex"]>>
 })
 
 test("archive と restore メソッドの型保持", () => {
@@ -156,17 +142,13 @@ test("archive と restore メソッドの型保持", () => {
   }
 
   // archive メソッドの戻り値の型
-  type ArchiveResult = Awaited<
-    ReturnType<DocFileMdReference<TestSchema>["archive"]>
-  >
+  type ArchiveResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["archive"]>>
 
   // 同じスキーマを持つ新しい参照を返す
   assertType<Equals<ArchiveResult, DocFileMdReference<TestSchema>>>()
 
   // restore メソッドの戻り値の型
-  type RestoreResult = Awaited<
-    ReturnType<DocFileMdReference<TestSchema>["restore"]>
-  >
+  type RestoreResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["restore"]>>
 
   // 同じスキーマを持つ新しい参照を返す
   assertType<Equals<RestoreResult, DocFileMdReference<TestSchema>>>()

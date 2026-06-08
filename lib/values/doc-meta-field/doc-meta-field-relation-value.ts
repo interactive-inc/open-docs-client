@@ -15,14 +15,8 @@ export class DocMetaFieldRelationValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    value: unknown,
-  ): DocMetaFieldRelationValue<K> {
-    return new DocMetaFieldRelationValue<K>(
-      key,
-      zDocMetaFieldRelation.parse(value),
-    )
+  static from<K extends RecordKey>(key: K, value: unknown): DocMetaFieldRelationValue<K> {
+    return new DocMetaFieldRelationValue<K>(key, zDocMetaFieldRelation.parse(value))
   }
 
   static default<K extends RecordKey>(key: K): DocMetaFieldRelationValue<K> {

@@ -1,9 +1,30 @@
 {
   "name": "@interactive-inc/docs-client",
   "version": "1.2.0",
+  "homepage": "https://github.com/interactive-inc/open-docs-client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/interactive-inc/open-docs-client.git"
+  },
   "type": "module",
+  "main": "build/index.js",
+  "module": "build/index.js",
+  "types": "build/index.d.ts",
+  "exports": {
+    ".": "./build/index.js",
+    "./models": "./build/models.js",
+    "./file-system": "./build/file-system.js",
+    "./file-system-json": "./build/file-system-json.js",
+    "./file-system-mock": "./build/file-system-mock.js",
+    "./file-system-node": "./build/file-system-node.js",
+    "./file-system-octokit": "./build/file-system-octokit.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "format": "biome check . --fix --unsafe",
+    "fmt": "vp fmt",
+    "lint": "vp lint",
     "claude": "claude --dangerously-skip-permissions --mcp-config .mcp.json",
     "claude:continue": "claude --continue --dangerously-skip-permissions --mcp-config .mcp.json",
     "check": "tsgo --noEmit",
@@ -18,35 +39,15 @@
     "zod": "^4.0.10"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.1.2",
     "@types/bun": "^1.2.19",
     "@types/node": "^24.1.0",
     "@typescript/native-preview": "^7.0.0-dev.20251121.1",
     "concurrently": "^9.2.0",
     "tsup": "^8.5.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite-plus": "^0.1.24"
   },
   "peerDependencies": {
     "zod": "^4.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
-  "module": "build/index.js",
-  "exports": {
-    ".": "./build/index.js",
-    "./models": "./build/models.js",
-    "./file-system": "./build/file-system.js",
-    "./file-system-json": "./build/file-system-json.js",
-    "./file-system-mock": "./build/file-system-mock.js",
-    "./file-system-node": "./build/file-system-node.js",
-    "./file-system-octokit": "./build/file-system-octokit.js"
-  },
-  "homepage": "https://github.com/interactive-inc/open-docs-client",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/interactive-inc/open-docs-client.git"
   }
 }

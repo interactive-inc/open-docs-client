@@ -1,7 +1,4 @@
-import {
-  zDocCustomSchemaFieldMultiRelation,
-  zDocMetaFieldMultiRelation,
-} from "@/models"
+import { zDocCustomSchemaFieldMultiRelation, zDocMetaFieldMultiRelation } from "@/models"
 import type {
   DocCustomSchemaFieldMultiRelation,
   DocMetaFieldMultiRelation,
@@ -32,9 +29,7 @@ export class DocCustomSchemaFieldMultiRelationValue<K extends RecordKey> {
       return zDocMetaFieldMultiRelation.parse(value)
     } catch {
       if (this.value.required) {
-        throw new Error(
-          `required field "${this.key.toString()}" is missing or invalid`,
-        )
+        throw new Error(`required field "${this.key.toString()}" is missing or invalid`)
       }
       return DocCustomSchemaFieldMultiRelationValue.defaultValue()
     }

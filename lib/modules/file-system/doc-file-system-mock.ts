@@ -50,16 +50,10 @@ export class DocFileSystemMock implements DocFileSystemInterface {
   private readonly pathSystem: DocPathSystem
   private readonly basePath: string
 
-  constructor(props: {
-    basePath: string
-    pathSystem?: DocPathSystem
-    skipDefaultFiles?: boolean
-  }) {
+  constructor(props: { basePath: string; pathSystem?: DocPathSystem; skipDefaultFiles?: boolean }) {
     this.pathSystem = props.pathSystem ?? new DocPathSystem()
 
-    this.basePath = props.basePath.endsWith("/")
-      ? props.basePath.slice(0, -1)
-      : props.basePath
+    this.basePath = props.basePath.endsWith("/") ? props.basePath.slice(0, -1) : props.basePath
 
     // skipDefaultFilesがtrueでない場合のみmockDirectoryDataでfilesを初期化
     if (!props.skipDefaultFiles) {
@@ -152,9 +146,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
       for (const [path, content] of Object.entries(props.fileContents)) {
         // basePathを使って正規化
         const cleanPath = path.startsWith("/") ? path.slice(1) : path
-        const normalizedPath = path.startsWith(basePath)
-          ? path
-          : `${basePath}/${cleanPath}`
+        const normalizedPath = path.startsWith(basePath) ? path : `${basePath}/${cleanPath}`
         fileSystem.files.set(normalizedPath, {
           content,
           modifiedTime: now,
@@ -173,9 +165,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
       const file = this.files.get(normalizedPath)
       return file ? file.content : null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to read file at ${filePath}`)
+      return error instanceof Error ? error : new Error(`Failed to read file at ${filePath}`)
     }
   }
 
@@ -193,9 +183,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
       })
       return null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to write file at ${filePath}`)
+      return error instanceof Error ? error : new Error(`Failed to write file at ${filePath}`)
     }
   }
 
@@ -216,9 +204,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
       return true
     }
 
-    const dirPath = normalizedPath.endsWith("/")
-      ? normalizedPath
-      : `${normalizedPath}/`
+    const dirPath = normalizedPath.endsWith("/") ? normalizedPath : `${normalizedPath}/`
     for (const path of this.files.keys()) {
       if (path.startsWith(dirPath)) {
         return true
@@ -271,9 +257,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
   }
 
   async readDirectory(directoryPath: string): Promise<string[]> {
-    const dirPath = directoryPath.endsWith("/")
-      ? directoryPath
-      : `${directoryPath}/`
+    const dirPath = directoryPath.endsWith("/") ? directoryPath : `${directoryPath}/`
     const entries = new Set<string>()
 
     for (const path of this.files.keys()) {
@@ -290,9 +274,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
   }
 
   async readDirectoryRecursive(directoryPath: string): Promise<string[]> {
-    const dirPath = directoryPath.endsWith("/")
-      ? directoryPath
-      : `${directoryPath}/`
+    const dirPath = directoryPath.endsWith("/") ? directoryPath : `${directoryPath}/`
     const files: string[] = []
 
     for (const path of this.files.keys()) {
@@ -304,21 +286,14 @@ export class DocFileSystemMock implements DocFileSystemInterface {
     return files.sort()
   }
 
-  async readDirectoryFilePaths(
-    directoryPath: string,
-  ): Promise<string[] | Error> {
+  async readDirectoryFilePaths(directoryPath: string): Promise<string[] | Error> {
     try {
       const normalizedDir = this.normalizePath(directoryPath)
-      const dirPath = normalizedDir.endsWith("/")
-        ? normalizedDir
-        : `${normalizedDir}/`
+      const dirPath = normalizedDir.endsWith("/") ? normalizedDir : `${normalizedDir}/`
       const files: string[] = []
 
       for (const path of this.files.keys()) {
-        if (
-          path.startsWith(dirPath) &&
-          !path.slice(dirPath.length).includes("/")
-        ) {
+        if (path.startsWith(dirPath) && !path.slice(dirPath.length).includes("/")) {
           // basePathを除去して相対パスにして返す
           const relativePath = path.startsWith(`${this.basePath}/`)
             ? path.slice(this.basePath.length + 1)
@@ -341,9 +316,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
   }
 
   async deleteDirectory(directoryPath: string): Promise<void> {
-    const dirPath = directoryPath.endsWith("/")
-      ? directoryPath
-      : `${directoryPath}/`
+    const dirPath = directoryPath.endsWith("/") ? directoryPath : `${directoryPath}/`
 
     for (const path of this.files.keys()) {
       if (path.startsWith(dirPath)) {
@@ -361,9 +334,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
       }
       return file.size
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to get file size at ${filePath}`)
+      return error instanceof Error ? error : new Error(`Failed to get file size at ${filePath}`)
     }
   }
 
@@ -401,9 +372,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
     // In memory system doesn't track directories explicitly
     // Check if any files exist with this prefix
     const normalizedPath = this.normalizePath(relativePath)
-    const dirPath = normalizedPath.endsWith("/")
-      ? normalizedPath
-      : `${normalizedPath}/`
+    const dirPath = normalizedPath.endsWith("/") ? normalizedPath : `${normalizedPath}/`
     for (const path of this.files.keys()) {
       if (path.startsWith(dirPath)) {
         return true
@@ -422,11 +391,8 @@ export class DocFileSystemMock implements DocFileSystemInterface {
    */
   async readDirectoryFileNames(directoryPath = ""): Promise<string[] | Error> {
     try {
-      const normalizedDir =
-        directoryPath === "" ? this.basePath : this.normalizePath(directoryPath)
-      const dirPath = normalizedDir.endsWith("/")
-        ? normalizedDir
-        : `${normalizedDir}/`
+      const normalizedDir = directoryPath === "" ? this.basePath : this.normalizePath(directoryPath)
+      const dirPath = normalizedDir.endsWith("/") ? normalizedDir : `${normalizedDir}/`
       const entries = new Set<string>()
 
       for (const path of this.files.keys()) {
@@ -499,9 +465,7 @@ export class DocFileSystemMock implements DocFileSystemInterface {
     return Array.from(this.files.keys())
       .map((path) => {
         // basePathを除去して相対パスにして返す
-        return path.startsWith(`${this.basePath}/`)
-          ? path.slice(this.basePath.length + 1)
-          : path
+        return path.startsWith(`${this.basePath}/`) ? path.slice(this.basePath.length + 1) : path
       })
       .sort()
   }

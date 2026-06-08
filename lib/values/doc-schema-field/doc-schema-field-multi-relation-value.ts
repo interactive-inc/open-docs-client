@@ -1,8 +1,4 @@
-import type {
-  DocFileIndexSchemaField,
-  DocSchemaFieldMultiRelation,
-  RecordKey,
-} from "@/types"
+import type { DocFileIndexSchemaField, DocSchemaFieldMultiRelation, RecordKey } from "@/types"
 
 /**
  * Multiple relation type schema field
@@ -60,9 +56,7 @@ export class DocSchemaFieldMultiRelationValue<T extends RecordKey> {
     return { ...this.value }
   }
 
-  static empty<T extends RecordKey>(
-    key: T,
-  ): DocSchemaFieldMultiRelationValue<T> {
+  static empty<T extends RecordKey>(key: T): DocSchemaFieldMultiRelationValue<T> {
     return new DocSchemaFieldMultiRelationValue(key, {
       type: "multi-relation",
       required: false,

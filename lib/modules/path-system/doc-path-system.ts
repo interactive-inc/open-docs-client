@@ -124,10 +124,7 @@ export class DocPathSystem {
 
     for (const segment of segments) {
       if (segment === "..") {
-        if (
-          normalized.length > 0 &&
-          normalized[normalized.length - 1] !== ".."
-        ) {
+        if (normalized.length > 0 && normalized[normalized.length - 1] !== "..") {
           normalized.pop()
         } else if (!isAbsolute) {
           normalized.push("..")

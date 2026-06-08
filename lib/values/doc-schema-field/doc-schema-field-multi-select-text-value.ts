@@ -1,8 +1,4 @@
-import type {
-  DocFileIndexSchemaField,
-  DocSchemaFieldMultiSelectText,
-  RecordKey,
-} from "@/types"
+import type { DocFileIndexSchemaField, DocSchemaFieldMultiSelectText, RecordKey } from "@/types"
 
 /**
  * Multiple select text type schema field
@@ -63,9 +59,7 @@ export class DocSchemaFieldMultiSelectTextValue<T extends RecordKey> {
     return { ...this.value }
   }
 
-  static empty<T extends RecordKey>(
-    key: T,
-  ): DocSchemaFieldMultiSelectTextValue<T> {
+  static empty<T extends RecordKey>(key: T): DocSchemaFieldMultiSelectTextValue<T> {
     return new DocSchemaFieldMultiSelectTextValue(key, {
       type: "multi-select-text",
       required: false,

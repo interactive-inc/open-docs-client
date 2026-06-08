@@ -22,10 +22,7 @@ function createMockFileSystem() {
     readDirectoryFilePaths: async (path: string) => {
       const filesInDir: string[] = []
       for (const [filePath] of files) {
-        if (
-          filePath.startsWith(`${path}/`) &&
-          !filePath.includes("/", path.length + 1)
-        ) {
+        if (filePath.startsWith(`${path}/`) && !filePath.includes("/", path.length + 1)) {
           filesInDir.push(filePath)
         }
       }

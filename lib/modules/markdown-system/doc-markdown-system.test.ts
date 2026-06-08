@@ -88,30 +88,18 @@ test("説明の更新と追加", () => {
 
   // 既存説明の更新
   const markdown1 = "# タイトル\n\n古い説明\n\n本文"
-  const updated1 = system.updateDescription(
-    markdown1,
-    "新しい説明",
-    "デフォルト",
-  )
+  const updated1 = system.updateDescription(markdown1, "新しい説明", "デフォルト")
   expect(system.extractDescription(updated1)).toBe("新しい説明")
 
   // 説明の新規追加（タイトルあり）
   const markdown2 = "# タイトル\n\n## サブタイトル"
-  const updated2 = system.updateDescription(
-    markdown2,
-    "新しい説明",
-    "デフォルト",
-  )
-  expect(system.extractBody(updated2)).toBe(
-    "# タイトル\n\n新しい説明\n\n## サブタイトル",
-  )
+  const updated2 = system.updateDescription(markdown2, "新しい説明", "デフォルト")
+  expect(system.extractBody(updated2)).toBe("# タイトル\n\n新しい説明\n\n## サブタイトル")
 
   // タイトルも説明もない場合
   const markdown3 = "本文のみ"
   const updated3 = system.updateDescription(markdown3, "説明", "新規タイトル")
-  expect(system.extractBody(updated3)).toBe(
-    "# 新規タイトル\n\n説明\n\n本文のみ",
-  )
+  expect(system.extractBody(updated3)).toBe("# 新規タイトル\n\n説明\n\n本文のみ")
   expect(system.extractTitle(updated3)).toBe("新規タイトル")
   expect(system.extractDescription(updated3)).toBe("説明")
 })
@@ -138,15 +126,11 @@ description: "Test Description"`)
 
 // 静的メソッドのテスト
 test("from メソッドでMarkdownを生成", () => {
-  expect(DocMarkdownSystem.from("タイトル", "説明", "本文")).toBe(
-    "# タイトル\n\n説明\n\n本文",
-  )
+  expect(DocMarkdownSystem.from("タイトル", "説明", "本文")).toBe("# タイトル\n\n説明\n\n本文")
 
   expect(DocMarkdownSystem.from("", "説明", "本文")).toBe("説明\n\n本文")
 
-  expect(DocMarkdownSystem.from("タイトル", "", "本文")).toBe(
-    "# タイトル\n\n本文",
-  )
+  expect(DocMarkdownSystem.from("タイトル", "", "本文")).toBe("# タイトル\n\n本文")
 })
 
 // 空行スキップのエッジケース

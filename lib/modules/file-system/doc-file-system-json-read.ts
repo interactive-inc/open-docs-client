@@ -10,9 +10,7 @@ function parseJsonDocumentData(data: unknown): JsonDocumentData | Error {
   try {
     return zJsonDocumentData.parse(data)
   } catch (error) {
-    return error instanceof Error
-      ? error
-      : new Error("Failed to parse JSON document data")
+    return error instanceof Error ? error : new Error("Failed to parse JSON document data")
   }
 }
 
@@ -52,9 +50,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
       const content = this.data[normalizedPath]
       return content ?? null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to read file at ${relativePath}`)
+      return error instanceof Error ? error : new Error(`Failed to read file at ${relativePath}`)
     }
   }
 
@@ -89,10 +85,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
 
       for (const filePath of Object.keys(this.data)) {
         if (this.isFileInDirectory(filePath, normalizedDir)) {
-          const relativePart = this.getRelativePartFromDirectory(
-            filePath,
-            normalizedDir,
-          )
+          const relativePart = this.getRelativePartFromDirectory(filePath, normalizedDir)
           const segments = relativePart.split("/").filter(Boolean)
           if (segments.length > 0) {
             fileNames.add(segments[0])
@@ -111,9 +104,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
   /**
    * Get list of file paths in directory
    */
-  async readDirectoryFilePaths(
-    relativePath: string,
-  ): Promise<string[] | Error> {
+  async readDirectoryFilePaths(relativePath: string): Promise<string[] | Error> {
     try {
       const fileNames = await this.readDirectoryFileNames(relativePath)
 
@@ -121,9 +112,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
         return fileNames
       }
 
-      return fileNames.map((fileName) =>
-        this.pathSystem.join(relativePath, fileName),
-      )
+      return fileNames.map((fileName) => this.pathSystem.join(relativePath, fileName))
     } catch (error) {
       return error instanceof Error
         ? error
@@ -273,10 +262,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
   /**
    * Get the relative part of a file path from a directory
    */
-  private getRelativePartFromDirectory(
-    filePath: string,
-    dirPath: string,
-  ): string {
+  private getRelativePartFromDirectory(filePath: string, dirPath: string): string {
     if (dirPath === "") {
       return filePath
     }

@@ -7,9 +7,7 @@ import { DocFileIndexReference } from "./doc-file-index-reference"
 test("DocFileIndexReference - writeメソッドがフロントマターを含む完全なテキストを書き込む", async () => {
   const fileSystem = DocFileSystemMock.createWithFiles({
     fileContents: {
-      "docs/products/features/index.md": ["# 機能", "", "機能の説明"].join(
-        "\n",
-      ),
+      "docs/products/features/index.md": ["# 機能", "", "機能の説明"].join("\n"),
     },
   })
 
@@ -29,9 +27,7 @@ test("DocFileIndexReference - writeメソッドがフロントマターを含む
   expect(entity).toBeInstanceOf(DocFileIndexEntity)
 
   // タイトルを更新
-  const updatedEntity = entity.withContent(
-    entity.content.withTitle("新しいタイトル"),
-  )
+  const updatedEntity = entity.withContent(entity.content.withTitle("新しいタイトル"))
 
   // ファイルに書き込む
   await ref.write(updatedEntity)

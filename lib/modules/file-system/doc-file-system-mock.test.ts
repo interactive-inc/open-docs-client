@@ -74,14 +74,7 @@ test("DocFileSystemMock - ディレクトリの読み込み", async () => {
   await fileSystem.writeFile("docs/subdir/file3.md", "content3")
 
   const fileNames = await fileSystem.readDirectoryFileNames("docs")
-  expect(fileNames).toEqual([
-    "api",
-    "file1.md",
-    "file2.md",
-    "guide",
-    "index.md",
-    "subdir",
-  ])
+  expect(fileNames).toEqual(["api", "file1.md", "file2.md", "guide", "index.md", "subdir"])
 
   const filePaths = await fileSystem.readDirectoryFilePaths("docs")
   expect(filePaths).toEqual(["docs/file1.md", "docs/file2.md", "docs/index.md"])

@@ -94,9 +94,7 @@ test("ファイルデータが無効な場合もエラーが発生する", () =>
   expect(() => {
     new DocRelationValue({
       path: "users",
-      files: [
-        { name: 123 as never, label: "Invalid", value: null, path: null },
-      ],
+      files: [{ name: 123 as never, label: "Invalid", value: null, path: null }],
     })
   }).toThrow()
 })

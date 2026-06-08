@@ -15,14 +15,8 @@ export class DocMetaFieldSelectTextValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    value: unknown,
-  ): DocMetaFieldSelectTextValue<K> {
-    return new DocMetaFieldSelectTextValue<K>(
-      key,
-      zDocMetaFieldSelectText.parse(value),
-    )
+  static from<K extends RecordKey>(key: K, value: unknown): DocMetaFieldSelectTextValue<K> {
+    return new DocMetaFieldSelectTextValue<K>(key, zDocMetaFieldSelectText.parse(value))
   }
 
   static default<K extends RecordKey>(key: K): DocMetaFieldSelectTextValue<K> {

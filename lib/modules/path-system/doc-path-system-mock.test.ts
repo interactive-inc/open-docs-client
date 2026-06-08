@@ -5,9 +5,7 @@ test("DocPathSystemMock - join: パスを結合", () => {
   const pathSystem = new DocPathSystemMock()
 
   expect(pathSystem.join("docs", "index.md")).toBe("docs/index.md")
-  expect(pathSystem.join("docs", "guide", "intro.md")).toBe(
-    "docs/guide/intro.md",
-  )
+  expect(pathSystem.join("docs", "guide", "intro.md")).toBe("docs/guide/intro.md")
   expect(pathSystem.join("", "docs", "", "file.md")).toBe("docs/file.md")
   expect(pathSystem.join("/root", "docs", "file.md")).toBe("/root/docs/file.md")
 })
@@ -57,9 +55,7 @@ test("DocPathSystemMock - resolve: 絶対パスに変換", () => {
   expect(pathSystem.resolve("docs/index.md")).toBe("/mock-cwd/docs/index.md")
   expect(pathSystem.resolve("/absolute/path")).toBe("/absolute/path")
   expect(pathSystem.resolve("docs", "../other")).toBe("/mock-cwd/other")
-  expect(pathSystem.resolve("/root", "docs", "file.md")).toBe(
-    "/root/docs/file.md",
-  )
+  expect(pathSystem.resolve("/root", "docs", "file.md")).toBe("/root/docs/file.md")
 })
 
 test("DocPathSystemMock - normalize: パスを正規化", () => {
@@ -67,9 +63,7 @@ test("DocPathSystemMock - normalize: パスを正規化", () => {
 
   expect(pathSystem.normalize("docs/./index.md")).toBe("docs/index.md")
   expect(pathSystem.normalize("docs/../other/file.md")).toBe("other/file.md")
-  expect(pathSystem.normalize("/docs//guide///intro.md")).toBe(
-    "/docs/guide/intro.md",
-  )
+  expect(pathSystem.normalize("/docs//guide///intro.md")).toBe("/docs/guide/intro.md")
   expect(pathSystem.normalize("")).toBe(".")
   expect(pathSystem.normalize("./")).toBe(".")
 })

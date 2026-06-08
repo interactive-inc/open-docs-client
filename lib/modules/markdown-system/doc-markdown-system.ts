@@ -116,11 +116,7 @@ export class DocMarkdownSystem {
   /**
    * Update description in body (returns body only, without FrontMatter)
    */
-  updateDescription(
-    text: string,
-    newDescription: string,
-    defaultTitle: string,
-  ): string {
+  updateDescription(text: string, newDescription: string, defaultTitle: string): string {
     // textはbodyのみを想定（FrontMatterは含まない）
     const lines = text.split("\n")
     const titleIndex = lines.findIndex((line) => line.match(/^#\s+/))
@@ -130,11 +126,7 @@ export class DocMarkdownSystem {
     } else {
       const descIndex = this.skipEmptyLines(lines, titleIndex + 1)
 
-      if (
-        descIndex < lines.length &&
-        lines[descIndex] &&
-        !lines[descIndex].startsWith("#")
-      ) {
+      if (descIndex < lines.length && lines[descIndex] && !lines[descIndex].startsWith("#")) {
         lines[descIndex] = newDescription
       } else {
         lines.splice(titleIndex + 1, 0, "", newDescription)

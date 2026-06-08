@@ -1,9 +1,5 @@
 import { zDocCustomSchemaFieldRelation, zDocMetaFieldRelation } from "@/models"
-import type {
-  DocCustomSchemaFieldRelation,
-  DocMetaFieldRelation,
-  RecordKey,
-} from "@/types"
+import type { DocCustomSchemaFieldRelation, DocMetaFieldRelation, RecordKey } from "@/types"
 
 export class DocCustomSchemaFieldRelationValue<K extends RecordKey> {
   constructor(
@@ -29,9 +25,7 @@ export class DocCustomSchemaFieldRelationValue<K extends RecordKey> {
       return zDocMetaFieldRelation.parse(value)
     } catch {
       if (this.value.required) {
-        throw new Error(
-          `required field "${this.key.toString()}" is missing or invalid`,
-        )
+        throw new Error(`required field "${this.key.toString()}" is missing or invalid`)
       }
       return DocCustomSchemaFieldRelationValue.defaultValue()
     }

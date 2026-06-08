@@ -1,9 +1,5 @@
 import { zDocCustomSchemaFieldBoolean, zDocMetaFieldBoolean } from "@/models"
-import type {
-  DocCustomSchemaFieldBoolean,
-  DocMetaFieldBoolean,
-  RecordKey,
-} from "@/types"
+import type { DocCustomSchemaFieldBoolean, DocMetaFieldBoolean, RecordKey } from "@/types"
 
 export class DocCustomSchemaFieldBooleanValue<K extends RecordKey> {
   constructor(
@@ -14,10 +10,7 @@ export class DocCustomSchemaFieldBooleanValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    required: boolean,
-  ): DocCustomSchemaFieldBooleanValue<K> {
+  static from<K extends RecordKey>(key: K, required: boolean): DocCustomSchemaFieldBooleanValue<K> {
     return new DocCustomSchemaFieldBooleanValue<K>(key, {
       type: "boolean",
       required,
@@ -29,9 +22,7 @@ export class DocCustomSchemaFieldBooleanValue<K extends RecordKey> {
       return zDocMetaFieldBoolean.parse(value)
     } catch {
       if (this.value.required) {
-        throw new Error(
-          `required field "${this.key.toString()}" is missing or invalid`,
-        )
+        throw new Error(`required field "${this.key.toString()}" is missing or invalid`)
       }
       return DocCustomSchemaFieldBooleanValue.defaultValue()
     }

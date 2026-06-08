@@ -100,10 +100,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
       }
 
       if (archivedContent !== null) {
-        const contentValue = DocFileMdContentValue.fromMarkdown(
-          archivedContent,
-          this.customSchema,
-        )
+        const contentValue = DocFileMdContentValue.fromMarkdown(archivedContent, this.customSchema)
         const pathValue = DocFilePathValue.fromPathWithSystem(
           actualPath,
           this.pathSystem,
@@ -125,10 +122,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
       return new Error(`File not found at ${this.path} or in archive.`)
     }
 
-    const contentValue = DocFileMdContentValue.fromMarkdown(
-      content,
-      this.customSchema,
-    )
+    const contentValue = DocFileMdContentValue.fromMarkdown(content, this.customSchema)
 
     const pathValue = DocFilePathValue.fromPathWithSystem(
       actualPath,
@@ -136,8 +130,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
       this.basePath,
     )
 
-    const isInArchiveDir =
-      this.path.includes("/_/") || this.path.startsWith("_/")
+    const isInArchiveDir = this.path.includes("/_/") || this.path.startsWith("_/")
 
     return new DocFileMdEntity<T>(
       {
@@ -167,11 +160,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
   empty(): DocFileMdEntity<T> {
     const contentValue = DocFileMdContentValue.empty("", this.customSchema)
 
-    const pathValue = DocFilePathValue.fromPathWithSystem(
-      this.path,
-      this.pathSystem,
-      this.basePath,
-    )
+    const pathValue = DocFilePathValue.fromPathWithSystem(this.path, this.pathSystem, this.basePath)
 
     return new DocFileMdEntity<T>(
       {
@@ -207,11 +196,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
    */
   async writeDefault(): Promise<Error | null> {
     const fileName = this.pathSystem.basename(this.path, ".md")
-    const defaultContent = [
-      `# ${fileName}`,
-      "",
-      "Write your content here.",
-    ].join("\n")
+    const defaultContent = [`# ${fileName}`, "", "Write your content here."].join("\n")
     return await this.fileSystem.writeFile(this.path, defaultContent)
   }
 
@@ -246,11 +231,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const fileName = this.pathSystem.basename(this.path)
 
-    const archivePath = this.pathSystem.join(
-      dirPath,
-      archiveDirectoryName,
-      fileName,
-    )
+    const archivePath = this.pathSystem.join(dirPath, archiveDirectoryName, fileName)
 
     const moveResult = await this.moveTo(archivePath)
     if (moveResult instanceof Error) {
@@ -282,10 +263,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const fileName = this.pathSystem.basename(this.path)
 
-    const restorePath = this.pathSystem.join(
-      this.pathSystem.dirname(dirPath),
-      fileName,
-    )
+    const restorePath = this.pathSystem.join(this.pathSystem.dirname(dirPath), fileName)
 
     const moveResult = await this.moveTo(restorePath)
     if (moveResult instanceof Error) {
@@ -384,23 +362,17 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const schemaValue = indexFile.content.meta().schema()
 
-    const fieldValue =
-      schemaValue.value[key as string as keyof typeof schemaValue.value]
+    const fieldValue = schemaValue.value[key as string as keyof typeof schemaValue.value]
     if (!fieldValue || fieldValue.type !== "relation") {
       return null
     }
 
-    const schemaField = schemaValue.field(
-      key as string as keyof typeof schemaValue.customSchema,
-    )
+    const schemaField = schemaValue.field(key as string as keyof typeof schemaValue.customSchema)
     const relationField = schemaField as unknown as { path: string }
     let resolvedPath = relationField.path
 
     if (relationField.path.startsWith("..")) {
-      resolvedPath = this.pathSystem.join(
-        this.directoryPath,
-        relationField.path,
-      )
+      resolvedPath = this.pathSystem.join(this.directoryPath, relationField.path)
       resolvedPath = this.pathSystem.normalize(resolvedPath)
     }
 
@@ -433,11 +405,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
       })
     }
 
-    const archivedIndexPath = this.pathSystem.join(
-      this.directoryPath,
-      "_",
-      "index.md",
-    )
+    const archivedIndexPath = this.pathSystem.join(this.directoryPath, "_", "index.md")
 
     const archivedExists = await this.fileSystem.exists(archivedIndexPath)
 

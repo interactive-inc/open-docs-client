@@ -1,11 +1,6 @@
 import type { z } from "zod"
 import { zDocFileMd } from "@/models"
-import type {
-  DocCustomSchema,
-  DocFileMd,
-  DocFilePath,
-  UpdateFunction,
-} from "@/types"
+import type { DocCustomSchema, DocFileMd, DocFilePath, UpdateFunction } from "@/types"
 import type { DocFileMdMetaValue } from "@/values/doc-file-md-meta-value"
 import { DocFileMdContentValue } from "../values/doc-file-md-content-value"
 
@@ -40,14 +35,10 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
    */
   withContent(content: DocFileMdContentValue<T>): DocFileMdEntity<T>
 
-  withContent(
-    updater: UpdateFunction<DocFileMdContentValue<T>>,
-  ): DocFileMdEntity<T>
+  withContent(updater: UpdateFunction<DocFileMdContentValue<T>>): DocFileMdEntity<T>
 
   withContent(
-    contentOrUpdater:
-      | DocFileMdContentValue<T>
-      | UpdateFunction<DocFileMdContentValue<T>>,
+    contentOrUpdater: DocFileMdContentValue<T> | UpdateFunction<DocFileMdContentValue<T>>,
   ): DocFileMdEntity<T> {
     if (typeof contentOrUpdater === "function") {
       const updatedContent = contentOrUpdater(this.content())
@@ -69,20 +60,12 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
 
   withPath(updater: UpdateFunction<DocFilePath>): DocFileMdEntity<T>
 
-  withPath(
-    pathOrUpdater: DocFilePath | UpdateFunction<DocFilePath>,
-  ): DocFileMdEntity<T> {
+  withPath(pathOrUpdater: DocFilePath | UpdateFunction<DocFilePath>): DocFileMdEntity<T> {
     if (typeof pathOrUpdater === "function") {
       const updatedPath = pathOrUpdater(this.path)
-      return new DocFileMdEntity<T>(
-        { ...this.value, path: updatedPath },
-        this.customSchema,
-      )
+      return new DocFileMdEntity<T>({ ...this.value, path: updatedPath }, this.customSchema)
     }
-    return new DocFileMdEntity<T>(
-      { ...this.value, path: pathOrUpdater },
-      this.customSchema,
-    )
+    return new DocFileMdEntity<T>({ ...this.value, path: pathOrUpdater }, this.customSchema)
   }
 
   withMeta(meta: DocFileMdMetaValue<T>): DocFileMdEntity<T>
@@ -90,9 +73,7 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
   withMeta(updater: UpdateFunction<DocFileMdMetaValue<T>>): DocFileMdEntity<T>
 
   withMeta(
-    metaOrUpdater:
-      | DocFileMdMetaValue<T>
-      | UpdateFunction<DocFileMdMetaValue<T>>,
+    metaOrUpdater: DocFileMdMetaValue<T> | UpdateFunction<DocFileMdMetaValue<T>>,
   ): DocFileMdEntity<T> {
     if (typeof metaOrUpdater === "function") {
       const currentMeta = this.content().meta()
@@ -127,10 +108,7 @@ export class DocFileMdEntity<T extends DocCustomSchema> {
     )
   }
 
-  withDescription(
-    description: string,
-    defaultTitle?: string,
-  ): DocFileMdEntity<T> {
+  withDescription(description: string, defaultTitle?: string): DocFileMdEntity<T> {
     const draft = this.content().withDescription(description, defaultTitle)
     return new DocFileMdEntity<T>(
       {

@@ -15,14 +15,8 @@ export class DocMetaFieldMultiTextValue<K extends RecordKey> {
     Object.freeze(this)
   }
 
-  static from<K extends RecordKey>(
-    key: K,
-    value: unknown,
-  ): DocMetaFieldMultiTextValue<K> {
-    return new DocMetaFieldMultiTextValue<K>(
-      key,
-      zDocMetaFieldMultiText.parse(value),
-    )
+  static from<K extends RecordKey>(key: K, value: unknown): DocMetaFieldMultiTextValue<K> {
+    return new DocMetaFieldMultiTextValue<K>(key, zDocMetaFieldMultiText.parse(value))
   }
 
   static default<K extends RecordKey>(key: K): DocMetaFieldMultiTextValue<K> {

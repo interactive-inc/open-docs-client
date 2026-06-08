@@ -26,10 +26,7 @@ export class DocFileSystemNodeWrite implements DocFileSystemWriteInterface {
   /**
    * Write content to file at the specified path (creates directory if needed)
    */
-  async writeFile(
-    relativePath: string,
-    content: string,
-  ): Promise<Error | null> {
+  async writeFile(relativePath: string, content: string): Promise<Error | null> {
     try {
       const fullPath = this.pathSystem.join(this.basePath, relativePath)
       const dirPath = this.pathSystem.dirname(fullPath)
@@ -37,9 +34,7 @@ export class DocFileSystemNodeWrite implements DocFileSystemWriteInterface {
       await fs.writeFile(fullPath, content, "utf-8")
       return null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to write file at ${relativePath}`)
+      return error instanceof Error ? error : new Error(`Failed to write file at ${relativePath}`)
     }
   }
 
@@ -99,10 +94,7 @@ export class DocFileSystemNodeWrite implements DocFileSystemWriteInterface {
   /**
    * Copy file
    */
-  async copyFile(
-    sourcePath: string,
-    destinationPath: string,
-  ): Promise<Error | null> {
+  async copyFile(sourcePath: string, destinationPath: string): Promise<Error | null> {
     try {
       const sourceFullPath = this.pathSystem.join(this.basePath, sourcePath)
       const destFullPath = this.pathSystem.join(this.basePath, destinationPath)
@@ -111,19 +103,14 @@ export class DocFileSystemNodeWrite implements DocFileSystemWriteInterface {
     } catch (error) {
       return error instanceof Error
         ? error
-        : new Error(
-            `Failed to copy file from ${sourcePath} to ${destinationPath}`,
-          )
+        : new Error(`Failed to copy file from ${sourcePath} to ${destinationPath}`)
     }
   }
 
   /**
    * Move file
    */
-  async moveFile(
-    sourcePath: string,
-    destinationPath: string,
-  ): Promise<Error | null> {
+  async moveFile(sourcePath: string, destinationPath: string): Promise<Error | null> {
     try {
       const sourceFullPath = this.pathSystem.join(this.basePath, sourcePath)
       const destFullPath = this.pathSystem.join(this.basePath, destinationPath)
@@ -132,9 +119,7 @@ export class DocFileSystemNodeWrite implements DocFileSystemWriteInterface {
     } catch (error) {
       return error instanceof Error
         ? error
-        : new Error(
-            `Failed to move file from ${sourcePath} to ${destinationPath}`,
-          )
+        : new Error(`Failed to move file from ${sourcePath} to ${destinationPath}`)
     }
   }
 }

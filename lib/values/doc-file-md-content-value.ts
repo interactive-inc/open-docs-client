@@ -76,17 +76,10 @@ export class DocFileMdContentValue<T extends DocCustomSchema> {
   /**
    * Update description
    */
-  withDescription(
-    description: string,
-    defaultTitle?: string,
-  ): DocFileMdContentValue<T> {
+  withDescription(description: string, defaultTitle?: string): DocFileMdContentValue<T> {
     const fullText = this.toText()
     const engine = new DocMarkdownSystem()
-    const updatedText = engine.updateDescription(
-      fullText,
-      description,
-      defaultTitle || this.title,
-    )
+    const updatedText = engine.updateDescription(fullText, description, defaultTitle || this.title)
     const updatedBody = engine.extractBody(updatedText)
     return new DocFileMdContentValue(
       {
@@ -127,18 +120,12 @@ export class DocFileMdContentValue<T extends DocCustomSchema> {
   /**
    * Update FrontMatter
    */
-  withMeta<U extends DocCustomSchema>(
-    meta: DocFileMdMetaValue<U>,
-  ): DocFileMdContentValue<U>
+  withMeta<U extends DocCustomSchema>(meta: DocFileMdMetaValue<U>): DocFileMdContentValue<U>
 
-  withMeta(
-    updater: UpdateFunction<DocFileMdMetaValue<T>>,
-  ): DocFileMdContentValue<T>
+  withMeta(updater: UpdateFunction<DocFileMdMetaValue<T>>): DocFileMdContentValue<T>
 
   withMeta<U extends DocCustomSchema>(
-    metaOrUpdater:
-      | DocFileMdMetaValue<U>
-      | UpdateFunction<DocFileMdMetaValue<T>>,
+    metaOrUpdater: DocFileMdMetaValue<U> | UpdateFunction<DocFileMdMetaValue<T>>,
   ): DocFileMdContentValue<U> | DocFileMdContentValue<T> {
     if (typeof metaOrUpdater === "function") {
       const updatedMeta = metaOrUpdater(this.meta())

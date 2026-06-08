@@ -11,9 +11,7 @@ function parseJsonDocumentData(data: unknown): JsonDocumentData | Error {
   try {
     return zJsonDocumentData.parse(data)
   } catch (error) {
-    return error instanceof Error
-      ? error
-      : new Error("Failed to parse JSON document data")
+    return error instanceof Error ? error : new Error("Failed to parse JSON document data")
   }
 }
 
@@ -53,19 +51,14 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
   /**
    * Write content to JSON data
    */
-  async writeFile(
-    relativePath: string,
-    content: string,
-  ): Promise<Error | null> {
+  async writeFile(relativePath: string, content: string): Promise<Error | null> {
     try {
       const normalizedPath = this.normalizePath(relativePath)
       this.data[normalizedPath] = content
       this.notifyDataChange()
       return null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to write file at ${relativePath}`)
+      return error instanceof Error ? error : new Error(`Failed to write file at ${relativePath}`)
     }
   }
 
@@ -84,9 +77,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
       this.notifyDataChange()
       return null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error(`Failed to delete file at ${relativePath}`)
+      return error instanceof Error ? error : new Error(`Failed to delete file at ${relativePath}`)
     }
   }
 
@@ -139,10 +130,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
   /**
    * Copy file within JSON data
    */
-  async copyFile(
-    sourcePath: string,
-    destinationPath: string,
-  ): Promise<Error | null> {
+  async copyFile(sourcePath: string, destinationPath: string): Promise<Error | null> {
     try {
       const normalizedSourcePath = this.normalizePath(sourcePath)
       const normalizedDestPath = this.normalizePath(destinationPath)
@@ -171,19 +159,14 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
     } catch (error) {
       return error instanceof Error
         ? error
-        : new Error(
-            `Failed to copy file from ${sourcePath} to ${destinationPath}`,
-          )
+        : new Error(`Failed to copy file from ${sourcePath} to ${destinationPath}`)
     }
   }
 
   /**
    * Move file within JSON data
    */
-  async moveFile(
-    sourcePath: string,
-    destinationPath: string,
-  ): Promise<Error | null> {
+  async moveFile(sourcePath: string, destinationPath: string): Promise<Error | null> {
     try {
       const copyResult = await this.copyFile(sourcePath, destinationPath)
       if (copyResult !== null) {
@@ -194,9 +177,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
     } catch (error) {
       return error instanceof Error
         ? error
-        : new Error(
-            `Failed to move file from ${sourcePath} to ${destinationPath}`,
-          )
+        : new Error(`Failed to move file from ${sourcePath} to ${destinationPath}`)
     }
   }
 
@@ -221,9 +202,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
       this.notifyDataChange()
       return null
     } catch (error) {
-      return error instanceof Error
-        ? error
-        : new Error("Failed to set JSON data")
+      return error instanceof Error ? error : new Error("Failed to set JSON data")
     }
   }
 

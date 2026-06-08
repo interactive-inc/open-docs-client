@@ -40,10 +40,7 @@ test("fromメソッドでタイトルがnullの場合はファイル名を使用
 })
 
 test("深いディレクトリ構造からもファイル名を抽出できる", () => {
-  const file = DocRelationFileValue.from(
-    "docs/products/client/features/login.md",
-    "ログイン機能",
-  )
+  const file = DocRelationFileValue.from("docs/products/client/features/login.md", "ログイン機能")
 
   expect(file.id).toBe("login")
   expect(file.label).toBe("ログイン機能")

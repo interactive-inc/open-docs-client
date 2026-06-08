@@ -52,11 +52,7 @@ test("DocMetaFieldFactory - リレーションフィールドの型推論", () =
   const factory = new DocMetaFieldFactory()
 
   // relation フィールド
-  const relationField = factory.fromType(
-    "author",
-    "relation",
-    "../authors/john",
-  )
+  const relationField = factory.fromType("author", "relation", "../authors/john")
   expect(relationField).toBeInstanceOf(DocMetaFieldRelationValue)
   expectType<DocMetaFieldValue<"author">>(relationField)
 })
@@ -65,10 +61,7 @@ test("DocMetaFieldFactory - 複数値フィールドの型推論", () => {
   const factory = new DocMetaFieldFactory()
 
   // multi-text フィールド
-  const multiTextField = factory.fromType("tags", "multi-text", [
-    "tag1",
-    "tag2",
-  ])
+  const multiTextField = factory.fromType("tags", "multi-text", ["tag1", "tag2"])
   expect(multiTextField).toBeInstanceOf(DocMetaFieldMultiTextValue)
   expectType<DocMetaFieldValue<"tags">>(multiTextField)
 
@@ -90,23 +83,13 @@ test("DocMetaFieldFactory - 複数選択フィールドの型推論", () => {
   const factory = new DocMetaFieldFactory()
 
   // multi-select-text フィールド
-  const multiSelectTextField = factory.fromType(
-    "categories",
-    "multi-select-text",
-    ["tech", "news"],
-  )
+  const multiSelectTextField = factory.fromType("categories", "multi-select-text", ["tech", "news"])
   expect(multiSelectTextField).toBeInstanceOf(DocMetaFieldMultiSelectTextValue)
   expectType<DocMetaFieldValue<"categories">>(multiSelectTextField)
 
   // multi-select-number フィールド
-  const multiSelectNumberField = factory.fromType(
-    "ratings",
-    "multi-select-number",
-    [1, 2, 3],
-  )
-  expect(multiSelectNumberField).toBeInstanceOf(
-    DocMetaFieldMultiSelectNumberValue,
-  )
+  const multiSelectNumberField = factory.fromType("ratings", "multi-select-number", [1, 2, 3])
+  expect(multiSelectNumberField).toBeInstanceOf(DocMetaFieldMultiSelectNumberValue)
   expectType<DocMetaFieldValue<"ratings">>(multiSelectNumberField)
 })
 
@@ -186,9 +169,6 @@ test("DocMetaFieldFactory - 値の変換", () => {
   const booleanField = factory.fromType("bool", "boolean", true)
   expect(booleanField.value).toBe(true)
 
-  const multiTextField = factory.fromType("tags", "multi-text", [
-    "tag1",
-    "tag2",
-  ])
+  const multiTextField = factory.fromType("tags", "multi-text", ["tag1", "tag2"])
   expect(multiTextField.value).toEqual(["tag1", "tag2"])
 })

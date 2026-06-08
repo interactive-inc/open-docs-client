@@ -117,9 +117,7 @@ const text = await fileRef.readText()
 ```typescript
 // Write an entity
 const entity = fileRef.empty()
-const updated = entity
-  .withTitle("Hello World")
-  .withDescription("My first article")
+const updated = entity.withTitle("Hello World").withDescription("My first article")
 await fileRef.write(updated)
 
 // Write raw text
@@ -250,19 +248,19 @@ if (!(entity instanceof Error)) {
 
 ### Schema Field Types
 
-| Type | Value Type | Description |
-|------|------------|-------------|
-| `text` | `string` | Single text value |
-| `number` | `number` | Numeric value |
-| `boolean` | `boolean` | True/false |
-| `select-text` | `string` | Single selection from text options |
-| `select-number` | `number` | Single selection from number options |
-| `multi-text` | `string[]` | Multiple text values |
-| `multi-number` | `number[]` | Multiple number values |
-| `multi-select-text` | `string[]` | Multiple selections from text options |
+| Type                  | Value Type | Description                             |
+| --------------------- | ---------- | --------------------------------------- |
+| `text`                | `string`   | Single text value                       |
+| `number`              | `number`   | Numeric value                           |
+| `boolean`             | `boolean`  | True/false                              |
+| `select-text`         | `string`   | Single selection from text options      |
+| `select-number`       | `number`   | Single selection from number options    |
+| `multi-text`          | `string[]` | Multiple text values                    |
+| `multi-number`        | `number[]` | Multiple number values                  |
+| `multi-select-text`   | `string[]` | Multiple selections from text options   |
 | `multi-select-number` | `number[]` | Multiple selections from number options |
-| `relation` | `string` | Reference to another document |
-| `multi-relation` | `string[]` | References to multiple documents |
+| `relation`            | `string`   | Reference to another document           |
+| `multi-relation`      | `string[]` | References to multiple documents        |
 
 ## Relations
 
@@ -405,66 +403,66 @@ const fileSystem = new DocFileSystemMock({ basePath: "docs" })
 
 ### DocClient
 
-| Method | Description |
-|--------|-------------|
-| `file(path)` | Get reference by path (auto-detects type) |
-| `mdFile(path)` | Get Markdown file reference |
-| `indexFile(path)` | Get index file reference |
-| `directory(path)` | Get directory reference |
-| `fileTree(path?)` | Build file tree from path |
-| `directoryTree(path?)` | Build directory-only tree |
-| `basePath()` | Get base path |
+| Method                 | Description                               |
+| ---------------------- | ----------------------------------------- |
+| `file(path)`           | Get reference by path (auto-detects type) |
+| `mdFile(path)`         | Get Markdown file reference               |
+| `indexFile(path)`      | Get index file reference                  |
+| `directory(path)`      | Get directory reference                   |
+| `fileTree(path?)`      | Build file tree from path                 |
+| `directoryTree(path?)` | Build directory-only tree                 |
+| `basePath()`           | Get base path                             |
 
 ### DocFileMdReference
 
-| Method | Description |
-|--------|-------------|
-| `read()` | Read file and return entity |
-| `readText()` | Read raw file content |
-| `write(entity)` | Write entity to file |
-| `writeText(text)` | Write raw text to file |
-| `writeDefault()` | Create file with default content |
-| `delete()` | Delete file |
-| `exists()` | Check if file exists |
-| `archive()` | Move to archive directory |
-| `restore()` | Restore from archive |
-| `size()` | Get file size in bytes |
-| `lastModified()` | Get last modified time |
-| `createdAt()` | Get creation time |
-| `directory()` | Get parent directory reference |
-| `relation(key)` | Get single relation reference |
-| `relations(key)` | Get multi-relation references |
+| Method            | Description                      |
+| ----------------- | -------------------------------- |
+| `read()`          | Read file and return entity      |
+| `readText()`      | Read raw file content            |
+| `write(entity)`   | Write entity to file             |
+| `writeText(text)` | Write raw text to file           |
+| `writeDefault()`  | Create file with default content |
+| `delete()`        | Delete file                      |
+| `exists()`        | Check if file exists             |
+| `archive()`       | Move to archive directory        |
+| `restore()`       | Restore from archive             |
+| `size()`          | Get file size in bytes           |
+| `lastModified()`  | Get last modified time           |
+| `createdAt()`     | Get creation time                |
+| `directory()`     | Get parent directory reference   |
+| `relation(key)`   | Get single relation reference    |
+| `relations(key)`  | Get multi-relation references    |
 
 ### DocDirectoryReference
 
-| Method | Description |
-|--------|-------------|
-| `fileNames()` | List file names |
-| `directoryNames()` | List subdirectory names |
-| `files()` | Get all file references |
-| `mdFiles()` | Get Markdown file references |
-| `directories()` | Get subdirectory references |
-| `file(name)` | Get file reference by name |
-| `mdFile(name)` | Get Markdown file reference |
-| `directory(name)` | Get subdirectory reference |
-| `indexFile()` | Get index file reference |
-| `readFiles()` | Read all files |
-| `readMdFiles()` | Read all Markdown files |
-| `readIndexFile()` | Read index file |
-| `createMdFile(name?)` | Create new Markdown file |
-| `exists()` | Check if directory exists |
+| Method                | Description                  |
+| --------------------- | ---------------------------- |
+| `fileNames()`         | List file names              |
+| `directoryNames()`    | List subdirectory names      |
+| `files()`             | Get all file references      |
+| `mdFiles()`           | Get Markdown file references |
+| `directories()`       | Get subdirectory references  |
+| `file(name)`          | Get file reference by name   |
+| `mdFile(name)`        | Get Markdown file reference  |
+| `directory(name)`     | Get subdirectory reference   |
+| `indexFile()`         | Get index file reference     |
+| `readFiles()`         | Read all files               |
+| `readMdFiles()`       | Read all Markdown files      |
+| `readIndexFile()`     | Read index file              |
+| `createMdFile(name?)` | Create new Markdown file     |
+| `exists()`            | Check if directory exists    |
 
 ### DocFileMdEntity
 
-| Method | Description |
-|--------|-------------|
-| `content()` | Get content value object |
-| `path` | Get path information |
-| `withContent(content)` | Create copy with new content |
-| `withTitle(title)` | Create copy with new title |
+| Method                  | Description                      |
+| ----------------------- | -------------------------------- |
+| `content()`             | Get content value object         |
+| `path`                  | Get path information             |
+| `withContent(content)`  | Create copy with new content     |
+| `withTitle(title)`      | Create copy with new title       |
 | `withDescription(desc)` | Create copy with new description |
-| `withMeta(meta)` | Create copy with new metadata |
-| `toJson()` | Convert to JSON |
+| `withMeta(meta)`        | Create copy with new metadata    |
+| `toJson()`              | Convert to JSON                  |
 
 ## License
 

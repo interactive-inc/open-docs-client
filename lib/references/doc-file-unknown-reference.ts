@@ -86,18 +86,13 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
       return new Error(`File not found at ${this.path}.`)
     }
 
-    const isInArchiveDir =
-      this.path.includes("/_/") || this.path.startsWith("_/")
+    const isInArchiveDir = this.path.includes("/_/") || this.path.startsWith("_/")
 
     if (this.path.endsWith(".md")) {
       throw new Error("Use DocFileMdReference to read Markdown files.")
     }
 
-    const pathValue = DocFilePathValue.fromPathWithSystem(
-      this.path,
-      this.pathSystem,
-      this.basePath,
-    )
+    const pathValue = DocFilePathValue.fromPathWithSystem(this.path, this.pathSystem, this.basePath)
 
     const extension = this.pathSystem.extname(this.path).substring(1) // Remove dot
 
@@ -125,11 +120,7 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
    * Create empty DocFileUnknownEntity
    */
   empty(): DocFileUnknownEntity {
-    const pathValue = DocFilePathValue.fromPathWithSystem(
-      this.path,
-      this.pathSystem,
-      this.basePath,
-    )
+    const pathValue = DocFilePathValue.fromPathWithSystem(this.path, this.pathSystem, this.basePath)
     const extension = this.pathSystem.extname(this.path).substring(1) // Remove dot
 
     return new DocFileUnknownEntity({
@@ -219,11 +210,7 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
   ): Promise<DocFileUnknownReference<T>> {
     const dirPath = this.pathSystem.dirname(this.path)
     const fileName = this.pathSystem.basename(this.path)
-    const archivePath = this.pathSystem.join(
-      dirPath,
-      archiveDirectoryName,
-      fileName,
-    )
+    const archivePath = this.pathSystem.join(dirPath, archiveDirectoryName, fileName)
 
     const moveResult = await this.moveTo(archivePath)
     if (moveResult instanceof Error) {
@@ -253,10 +240,7 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
     }
 
     const fileName = this.pathSystem.basename(this.path)
-    const restorePath = this.pathSystem.join(
-      this.pathSystem.dirname(dirPath),
-      fileName,
-    )
+    const restorePath = this.pathSystem.join(this.pathSystem.dirname(dirPath), fileName)
 
     // Move file
     const moveResult = await this.moveTo(restorePath)

@@ -84,11 +84,7 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
             this.props.config,
             directoryMeta,
           )
-        : DocFileIndexContentValue.empty(
-            dirName,
-            this.customSchema,
-            this.props.config,
-          )
+        : DocFileIndexContentValue.empty(dirName, this.customSchema, this.props.config)
 
       return new DocFileIndexEntity(
         {
@@ -115,11 +111,7 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
           this.props.config,
           directoryMeta,
         )
-      : DocFileIndexContentValue.fromMarkdown(
-          content,
-          this.customSchema,
-          this.props.config,
-        )
+      : DocFileIndexContentValue.fromMarkdown(content, this.customSchema, this.props.config)
 
     return new DocFileIndexEntity(
       {
@@ -235,9 +227,7 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
   async writeDefault(): Promise<Error | null> {
     const dirPath = this.pathSystem.dirname(this.filePath)
 
-    const dirName =
-      this.pathSystem.basename(dirPath) ||
-      this.props.config.defaultDirectoryName
+    const dirName = this.pathSystem.basename(dirPath) || this.props.config.defaultDirectoryName
 
     const defaultContent = [
       `# ${dirName}`,
@@ -245,10 +235,7 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
       `Please describe the overview of ${dirName} here.`,
     ].join("\n")
 
-    const writeResult = await this.fileSystem.writeFile(
-      this.filePath,
-      defaultContent,
-    )
+    const writeResult = await this.fileSystem.writeFile(this.filePath, defaultContent)
 
     if (writeResult instanceof Error) {
       return writeResult
@@ -291,10 +278,7 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
     for (const key of fieldKeys) {
       const fieldValue = schema.value[key]
       if (fieldValue === undefined) continue
-      if (
-        fieldValue.type !== "relation" &&
-        fieldValue.type !== "multi-relation"
-      ) {
+      if (fieldValue.type !== "relation" && fieldValue.type !== "multi-relation") {
         continue
       }
       const field = schema.field(key)
@@ -367,16 +351,9 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
 
     const fileName = this.pathSystem.basename(this.filePath)
 
-    const archivePath = this.pathSystem.join(
-      dirPath,
-      archiveDirectoryName,
-      fileName,
-    )
+    const archivePath = this.pathSystem.join(dirPath, archiveDirectoryName, fileName)
 
-    const moveResult = await this.fileSystem.moveFile(
-      this.filePath,
-      archivePath,
-    )
+    const moveResult = await this.fileSystem.moveFile(this.filePath, archivePath)
     if (moveResult instanceof Error) {
       throw moveResult
     }
@@ -407,16 +384,10 @@ export class DocFileIndexReference<T extends DocCustomSchema> {
 
     const fileName = this.pathSystem.basename(this.filePath)
 
-    const restorePath = this.pathSystem.join(
-      this.pathSystem.dirname(dirPath),
-      fileName,
-    )
+    const restorePath = this.pathSystem.join(this.pathSystem.dirname(dirPath), fileName)
 
     // Move file
-    const moveResult = await this.fileSystem.moveFile(
-      this.filePath,
-      restorePath,
-    )
+    const moveResult = await this.fileSystem.moveFile(this.filePath, restorePath)
     if (moveResult instanceof Error) {
       throw moveResult
     }

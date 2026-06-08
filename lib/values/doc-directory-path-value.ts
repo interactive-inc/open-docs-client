@@ -40,8 +40,7 @@ export class DocDirectoryPathValue {
       return null
     }
     const parentPath = this.pathSystem.dirname(this.path)
-    const parentName =
-      parentPath === "." ? "" : this.pathSystem.basename(parentPath)
+    const parentName = parentPath === "." ? "" : this.pathSystem.basename(parentPath)
     return new DocDirectoryPathValue(
       {
         path: parentPath,
@@ -157,8 +156,7 @@ export class DocDirectoryPathValue {
     pathSystem: DocPathSystem,
   ): DocDirectoryPathValue {
     const name = dirPath === "." ? "" : pathSystem.basename(dirPath)
-    const fullPath =
-      dirPath === "." ? basePath : pathSystem.join(basePath, dirPath)
+    const fullPath = dirPath === "." ? basePath : pathSystem.join(basePath, dirPath)
 
     return new DocDirectoryPathValue(
       {

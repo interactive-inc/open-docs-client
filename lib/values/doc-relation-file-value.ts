@@ -58,8 +58,7 @@ export class DocRelationFileValue {
     }
 
     const lastSlash = filePath.lastIndexOf("/")
-    const fileNameWithExt =
-      lastSlash >= 0 ? filePath.slice(lastSlash + 1) : filePath
+    const fileNameWithExt = lastSlash >= 0 ? filePath.slice(lastSlash + 1) : filePath
 
     const lastDot = fileNameWithExt.lastIndexOf(".")
     if (lastDot > 0) {

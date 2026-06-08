@@ -30,9 +30,7 @@ export const zDocMetaFieldTypeMultiRelation = z.literal("multi-relation")
 
 export const zDocMetaFieldTypeMultiSelectText = z.literal("multi-select-text")
 
-export const zDocMetaFieldTypeMultiSelectNumber = z.literal(
-  "multi-select-number",
-)
+export const zDocMetaFieldTypeMultiSelectNumber = z.literal("multi-select-number")
 
 /**
  * Available types for schema fields
@@ -240,19 +238,13 @@ export const zDocFileMdMeta = z.record(z.string(), zDocMetaField)
  * FrontMatter input schema (allows undefined for external APIs)
  * Transforms undefined to null for internal consistency
  */
-export const zDocFileMdMetaInput = z.record(
-  z.string(),
-  zDocMetaField.or(z.undefined()),
-)
+export const zDocFileMdMetaInput = z.record(z.string(), zDocMetaField.or(z.undefined()))
 
 /**
  * Schema definition
  * Mapping of field names to schema fields
  */
-export const zDocFileIndexSchema = z.record(
-  z.string(),
-  zDocFileIndexSchemaField,
-)
+export const zDocFileIndexSchema = z.record(z.string(), zDocFileIndexSchemaField)
 
 /**
  * Schema definition input (allows undefined for external APIs)

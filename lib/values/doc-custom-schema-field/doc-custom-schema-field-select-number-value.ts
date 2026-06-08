@@ -1,12 +1,5 @@
-import {
-  zDocCustomSchemaFieldSelectNumber,
-  zDocMetaFieldSelectNumber,
-} from "@/models"
-import type {
-  DocCustomSchemaFieldSelectNumber,
-  DocMetaFieldSelectNumber,
-  RecordKey,
-} from "@/types"
+import { zDocCustomSchemaFieldSelectNumber, zDocMetaFieldSelectNumber } from "@/models"
+import type { DocCustomSchemaFieldSelectNumber, DocMetaFieldSelectNumber, RecordKey } from "@/types"
 
 export class DocCustomSchemaFieldSelectNumberValue<K extends RecordKey> {
   constructor(
@@ -32,9 +25,7 @@ export class DocCustomSchemaFieldSelectNumberValue<K extends RecordKey> {
       return zDocMetaFieldSelectNumber.parse(value)
     } catch {
       if (this.value.required) {
-        throw new Error(
-          `required field "${this.key.toString()}" is missing or invalid`,
-        )
+        throw new Error(`required field "${this.key.toString()}" is missing or invalid`)
       }
       return DocCustomSchemaFieldSelectNumberValue.defaultValue()
     }

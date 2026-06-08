@@ -212,12 +212,7 @@ test("FileTreeSystem - buildTreeメソッドが正しくツリーを構築する
       return files[path] || ""
     },
     exists: async (path: string) => {
-      return [
-        "file1.md",
-        "dir1/file2.md",
-        "dir1/subdir/file3.md",
-        "dir2/index.md",
-      ].includes(path)
+      return ["file1.md", "dir1/file2.md", "dir1/subdir/file3.md", "dir2/index.md"].includes(path)
     },
   } as unknown as DocFileSystem
 

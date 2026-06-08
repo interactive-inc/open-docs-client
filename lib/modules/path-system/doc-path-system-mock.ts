@@ -22,10 +22,7 @@ export class DocPathSystemMock extends DocPathSystem {
   override basename(path: string, ext?: string): string {
     const normalizedPath = path.replace(/\\/g, "/")
     const lastSlashIndex = normalizedPath.lastIndexOf("/")
-    let base =
-      lastSlashIndex === -1
-        ? normalizedPath
-        : normalizedPath.slice(lastSlashIndex + 1)
+    let base = lastSlashIndex === -1 ? normalizedPath : normalizedPath.slice(lastSlashIndex + 1)
 
     if (ext && base.endsWith(ext)) {
       base = base.slice(0, -ext.length)
@@ -109,10 +106,7 @@ export class DocPathSystemMock extends DocPathSystem {
 
     for (const part of parts) {
       if (part === "..") {
-        if (
-          normalizedParts.length > 0 &&
-          normalizedParts[normalizedParts.length - 1] !== ".."
-        ) {
+        if (normalizedParts.length > 0 && normalizedParts[normalizedParts.length - 1] !== "..") {
           normalizedParts.pop()
         } else if (!isAbsolute) {
           normalizedParts.push("..")

@@ -89,9 +89,7 @@ export class DocFilePathValue {
       name = pathSystem.basename(parentDir)
     }
 
-    const fullPath = basePath
-      ? pathSystem.join(basePath, filePath)
-      : pathSystem.resolve(filePath)
+    const fullPath = basePath ? pathSystem.join(basePath, filePath) : pathSystem.resolve(filePath)
 
     return new DocFilePathValue(
       {

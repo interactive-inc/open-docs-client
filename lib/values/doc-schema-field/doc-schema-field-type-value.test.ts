@@ -76,12 +76,8 @@ test("デフォルト値を正しく取得できる", () => {
   expect(new DocSchemaFieldTypeValue("number").getDefaultValue()).toBe(0)
   expect(new DocSchemaFieldTypeValue("boolean").getDefaultValue()).toBe(false)
   expect(new DocSchemaFieldTypeValue("relation").getDefaultValue()).toBe("")
-  expect(new DocSchemaFieldTypeValue("multi-text").getDefaultValue()).toEqual(
-    [],
-  )
-  expect(new DocSchemaFieldTypeValue("multi-number").getDefaultValue()).toEqual(
-    [],
-  )
+  expect(new DocSchemaFieldTypeValue("multi-text").getDefaultValue()).toEqual([])
+  expect(new DocSchemaFieldTypeValue("multi-number").getDefaultValue()).toEqual([])
 })
 
 test("値の検証が正しく動作する", () => {
