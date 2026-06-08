@@ -1,3 +1,4 @@
+import { createSafeProxy, type Safe } from "../create-safe-proxy"
 import { DocFileUnknownEntity } from "../entities/doc-file-unknown-entity"
 import type { DocFileSystemInterface } from "../modules/file-system/doc-file-system.interface"
 import type { DocPathSystem } from "../modules/path-system/doc-path-system"
@@ -25,6 +26,10 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
     this.pathSystem = props.pathSystem
     this.customSchema = props.customSchema
     Object.freeze(this)
+  }
+
+  get safe(): Safe<this> {
+    return createSafeProxy(this)
   }
 
   get fileSystem(): DocFileSystemInterface {
@@ -63,7 +68,6 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
       })
     }
 
-    // 通常のファイルの場合は、同じディレクトリを返す
     return new DocDirectoryReference<T>({
       archiveDirectoryName: this.props.config.archiveDirectoryName,
       indexFileName: this.props.config.indexFileName,
@@ -75,26 +79,26 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
     })
   }
 
-  async read(): Promise<Error | DocFileUnknownEntity> {
-    const content = await this.fileSystem.readFile(this.path)
-
-    if (content instanceof Error) {
-      return content
-    }
-
-    if (content === null) {
-      return new Error(`File not found at ${this.path}.`)
-    }
-
-    const isInArchiveDir = this.path.includes("/_/") || this.path.startsWith("_/")
-
+  async read(): Promise<DocFileUnknownEntity> {
     if (this.path.endsWith(".md")) {
       throw new Error("Use DocFileMdReference to read Markdown files.")
     }
 
+    const content = await this.fileSystem.readFile(this.path)
+
+    if (content instanceof Error) {
+      throw content
+    }
+
+    if (content === null) {
+      throw new Error(`File not found at ${this.path}.`)
+    }
+
+    const isInArchiveDir = this.path.includes("/_/") || this.path.startsWith("_/")
+
     const pathValue = DocFilePathValue.fromPathWithSystem(this.path, this.pathSystem, this.basePath)
 
-    const extension = this.pathSystem.extname(this.path).substring(1) // Remove dot
+    const extension = this.pathSystem.extname(this.path).substring(1)
 
     return new DocFileUnknownEntity({
       type: "unknown",
@@ -105,14 +109,8 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * Read file content
-   */
-  async readContent(): Promise<Error | string> {
+  async readContent(): Promise<string> {
     const entity = await this.read()
-    if (entity instanceof Error) {
-      return entity
-    }
     return entity.value.content
   }
 
@@ -121,7 +119,7 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
    */
   empty(): DocFileUnknownEntity {
     const pathValue = DocFilePathValue.fromPathWithSystem(this.path, this.pathSystem, this.basePath)
-    const extension = this.pathSystem.extname(this.path).substring(1) // Remove dot
+    const extension = this.pathSystem.extname(this.path).substring(1)
 
     return new DocFileUnknownEntity({
       type: "unknown",
@@ -132,79 +130,88 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * Write content to file
-   */
-  async writeContent(content: string): Promise<Error | null> {
-    return await this.fileSystem.writeFile(this.path, content)
+  async writeContent(content: string): Promise<void> {
+    const writeResult = await this.fileSystem.writeFile(this.path, content)
+
+    if (writeResult instanceof Error) {
+      throw writeResult
+    }
   }
 
-  /**
-   * Write entity
-   */
-  async write(entity: DocFileUnknownEntity): Promise<Error | null> {
-    return await this.fileSystem.writeFile(this.path, entity.value.content)
+  async write(entity: DocFileUnknownEntity): Promise<void> {
+    const writeResult = await this.fileSystem.writeFile(this.path, entity.value.content)
+
+    if (writeResult instanceof Error) {
+      throw writeResult
+    }
   }
 
-  /**
-   * Write raw content
-   */
-  async writeRaw(content: string): Promise<Error | null> {
-    return await this.fileSystem.writeFile(this.path, content)
+  async writeRaw(content: string): Promise<void> {
+    const writeResult = await this.fileSystem.writeFile(this.path, content)
+
+    if (writeResult instanceof Error) {
+      throw writeResult
+    }
   }
 
-  /**
-   * Delete file
-   */
-  async delete(): Promise<Error | null> {
-    return await this.fileSystem.deleteFile(this.path)
+  async delete(): Promise<void> {
+    const deleteResult = await this.fileSystem.deleteFile(this.path)
+
+    if (deleteResult instanceof Error) {
+      throw deleteResult
+    }
   }
 
-  /**
-   * Check if file exists
-   */
   async exists(): Promise<boolean> {
     return this.fileSystem.exists(this.path)
   }
 
-  /**
-   * Copy file
-   */
-  async copyTo(destinationPath: string): Promise<Error | null> {
-    return await this.fileSystem.copyFile(this.path, destinationPath)
+  async copyTo(destinationPath: string): Promise<void> {
+    const copyResult = await this.fileSystem.copyFile(this.path, destinationPath)
+
+    if (copyResult instanceof Error) {
+      throw copyResult
+    }
   }
 
-  /**
-   * Move file
-   */
-  async moveTo(destinationPath: string): Promise<Error | null> {
-    return await this.fileSystem.moveFile(this.path, destinationPath)
+  async moveTo(destinationPath: string): Promise<void> {
+    const moveResult = await this.fileSystem.moveFile(this.path, destinationPath)
+
+    if (moveResult instanceof Error) {
+      throw moveResult
+    }
   }
 
-  /**
-   * Get file size in bytes
-   */
-  async size(): Promise<number | Error> {
-    return this.fileSystem.getFileSize(this.path)
+  async size(): Promise<number> {
+    const fileSize = await this.fileSystem.getFileSize(this.path)
+
+    if (fileSize instanceof Error) {
+      throw fileSize
+    }
+
+    return fileSize
   }
 
-  /**
-   * Get file last modified time
-   */
-  async lastModified(): Promise<Date | Error> {
-    return this.fileSystem.getFileUpdatedTime(this.path)
+  async lastModified(): Promise<Date> {
+    const updatedTime = await this.fileSystem.getFileUpdatedTime(this.path)
+
+    if (updatedTime instanceof Error) {
+      throw updatedTime
+    }
+
+    return updatedTime
   }
 
-  /**
-   * Get file creation time
-   */
-  async createdAt(): Promise<Date | Error> {
-    return this.fileSystem.getFileCreatedTime(this.path)
+  async createdAt(): Promise<Date> {
+    const createdTime = await this.fileSystem.getFileCreatedTime(this.path)
+
+    if (createdTime instanceof Error) {
+      throw createdTime
+    }
+
+    return createdTime
   }
 
-  /**
-   * Move file to archive and return new reference
-   */
   async archive(
     archiveDirectoryName = this.props.config.archiveDirectoryName,
   ): Promise<DocFileUnknownReference<T>> {
@@ -212,10 +219,7 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
     const fileName = this.pathSystem.basename(this.path)
     const archivePath = this.pathSystem.join(dirPath, archiveDirectoryName, fileName)
 
-    const moveResult = await this.moveTo(archivePath)
-    if (moveResult instanceof Error) {
-      throw moveResult
-    }
+    await this.moveTo(archivePath)
 
     return new DocFileUnknownReference({
       path: archivePath,
@@ -226,9 +230,6 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * Restore file from archive and return new reference
-   */
   async restore(
     archiveDirectoryName = this.props.config.archiveDirectoryName,
   ): Promise<DocFileUnknownReference<T>> {
@@ -242,11 +243,7 @@ export class DocFileUnknownReference<T extends DocCustomSchema> {
     const fileName = this.pathSystem.basename(this.path)
     const restorePath = this.pathSystem.join(this.pathSystem.dirname(dirPath), fileName)
 
-    // Move file
-    const moveResult = await this.moveTo(restorePath)
-    if (moveResult instanceof Error) {
-      throw moveResult
-    }
+    await this.moveTo(restorePath)
 
     return new DocFileUnknownReference({
       path: restorePath,

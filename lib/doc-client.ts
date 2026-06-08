@@ -1,3 +1,4 @@
+import { createSafeProxy, type Safe } from "./create-safe-proxy"
 import { zDocClientConfig } from "./models"
 import type { DocFileSystemInterface } from "./modules/file-system/doc-file-system.interface"
 import { DocFileTreeSystem } from "./modules/file-tree-system/doc-file-tree-system"
@@ -20,9 +21,6 @@ type Props = {
   pathSystem?: DocPathSystem
   markdownSystem?: DocMarkdownSystem
   fileTreeSystem?: DocFileTreeSystem
-  /**
-   * Configuration
-   */
   config?: DocClientConfig
 }
 
@@ -38,7 +36,6 @@ export class DocClient {
     this.pathSystem = props.pathSystem ?? new DocPathSystem()
     this.markdownSystem = props.markdownSystem ?? new DocMarkdownSystem()
 
-    // Apply defaults to config
     const defaultConfig: DocClientConfig = {
       defaultIndexIcon: "📃",
       indexFileName: "index.md",
@@ -49,7 +46,7 @@ export class DocClient {
       metaFileName: ".meta.json",
     }
 
-    this.config = props.config ? zDocClientConfig.parse(props.config) : defaultConfig
+    this.config = zDocClientConfig.parse({ ...defaultConfig, ...props.config })
 
     const fileTreeSystem = new DocFileTreeSystem({
       fileSystem: this.fileSystem,
@@ -60,6 +57,10 @@ export class DocClient {
     })
 
     this.fileTreeSystem = props.fileTreeSystem ?? fileTreeSystem
+  }
+
+  get safe(): Safe<this> {
+    return createSafeProxy(this)
   }
 
   basePath(): string {
@@ -73,18 +74,13 @@ export class DocClient {
     customSchema: T,
   ): InferReference<Path, T>
 
-  /**
-   * Get file reference
-   */
   file<Path extends string, T extends DocCustomSchema>(relativePath: Path, customSchema?: T) {
-    // Check if it's index.md
     const fileName = this.pathSystem.basename(relativePath)
     if (fileName === this.config.indexFileName) {
       const dirPath = this.pathSystem.dirname(relativePath)
       return this.indexFile(dirPath === "." ? "" : dirPath, customSchema as T)
     }
 
-    // Check if it's a markdown file
     if (relativePath.endsWith(".md")) {
       if (customSchema === undefined) {
         return this.mdFile(relativePath)
@@ -92,7 +88,6 @@ export class DocClient {
       return this.mdFile<T>(relativePath, customSchema)
     }
 
-    // Unknown file type
     return new DocFileUnknownReference({
       path: relativePath,
       fileSystem: this.fileSystem,
@@ -106,9 +101,6 @@ export class DocClient {
 
   mdFile<T extends DocCustomSchema>(relativePath: string, customSchema: T): DocFileMdReference<T>
 
-  /**
-   * Markdown file reference
-   */
   mdFile<T extends DocCustomSchema>(relativePath: string, customSchema?: T) {
     const normalizedPath = relativePath.endsWith(".md") ? relativePath : `${relativePath}.md`
 
@@ -138,9 +130,6 @@ export class DocClient {
     customSchema: T,
   ): DocFileIndexReference<T>
 
-  /**
-   * Index file reference
-   */
   indexFile<T extends DocCustomSchema>(relativePath: string, customSchema?: T) {
     const indexPath =
       relativePath === ""
@@ -173,9 +162,6 @@ export class DocClient {
     customSchema: T,
   ): DocDirectoryReference<T>
 
-  /**
-   * Directory reference
-   */
   directory<T extends DocCustomSchema>(relativePath: string, customSchema?: T) {
     if (customSchema === undefined) {
       return new DocDirectoryReference<DocCustomSchema>({
@@ -201,18 +187,22 @@ export class DocClient {
   }
 
   async fileTree(directoryPath = ""): Promise<DocTreeNode[]> {
-    const results = await this.fileTreeSystem.buildFileTree(directoryPath)
-    if (results instanceof Error) {
-      throw results
+    const treeNodes = await this.fileTreeSystem.buildFileTree(directoryPath)
+
+    if (treeNodes instanceof Error) {
+      throw treeNodes
     }
-    return results.map((node) => node.toJson())
+
+    return treeNodes.map((node) => node.toJson())
   }
 
   async directoryTree(directoryPath = ""): Promise<DocTreeDirectoryNode[]> {
-    const results = await this.fileTreeSystem.buildDirectoryTree(directoryPath)
-    if (results instanceof Error) {
-      throw results
+    const treeNodes = await this.fileTreeSystem.buildDirectoryTree(directoryPath)
+
+    if (treeNodes instanceof Error) {
+      throw treeNodes
     }
-    return results.map((node) => node.toJson())
+
+    return treeNodes.map((node) => node.toJson())
   }
 }

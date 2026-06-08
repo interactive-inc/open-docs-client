@@ -86,9 +86,11 @@ export class DocFileTreeSystem {
     if (fileName.endsWith(".md")) {
       const mdFile = this.createMdFileReference(filePath)
       if (await mdFile.exists()) {
-        const entity = await mdFile.read()
-        if (!(entity instanceof Error)) {
+        try {
+          const entity = await mdFile.read()
           title = entity.value.content.title || fileName
+        } catch {
+          // keep default title
         }
       }
       icon = "📄"
@@ -117,15 +119,16 @@ export class DocFileTreeSystem {
     const indexFile = this.createIndexFileReference(filePath)
 
     if (await indexFile.exists()) {
-      const entity = await indexFile.read()
-      if (entity instanceof Error) {
-        return entity
-      }
-      title = entity.value.content.title || fileName
-      const content = entity.content
-      const frontMatter = content.meta()
-      if (frontMatter) {
-        icon = frontMatter.icon || this.config.defaultIndexIcon
+      try {
+        const entity = await indexFile.read()
+        title = entity.value.content.title || fileName
+        const content = entity.content
+        const frontMatter = content.meta()
+        if (frontMatter) {
+          icon = frontMatter.icon || this.config.defaultIndexIcon
+        }
+      } catch (error) {
+        return error instanceof Error ? error : new Error(String(error))
       }
     }
 
@@ -225,15 +228,16 @@ export class DocFileTreeSystem {
     const indexFile = this.createIndexFileReference(filePath)
 
     if (await indexFile.exists()) {
-      const entity = await indexFile.read()
-      if (entity instanceof Error) {
-        return entity
-      }
-      title = entity.value.content.title || fileName
-      const content = entity.content
-      const frontMatter = content.meta()
-      if (frontMatter && typeof frontMatter === "object" && "icon" in frontMatter) {
-        icon = frontMatter.icon || this.config.defaultIndexIcon
+      try {
+        const entity = await indexFile.read()
+        title = entity.value.content.title || fileName
+        const content = entity.content
+        const frontMatter = content.meta()
+        if (frontMatter && typeof frontMatter === "object" && "icon" in frontMatter) {
+          icon = frontMatter.icon || this.config.defaultIndexIcon
+        }
+      } catch (error) {
+        return error instanceof Error ? error : new Error(String(error))
       }
     }
 

@@ -1,5 +1,6 @@
-import { test } from "bun:test"
+import { expect, test } from "bun:test"
 import type { DocFileMdEntity } from "../entities/doc-file-md-entity"
+import { DocFileSystemMock } from "../modules/file-system/doc-file-system-mock"
 import type { DocFileSystemInterface } from "../modules/file-system/doc-file-system.interface"
 import type { DocPathSystem } from "../modules/path-system/doc-path-system"
 import type { DocCustomSchema, Equals } from "../types"
@@ -14,7 +15,6 @@ test("DocFileMdReference - ジェネリック型が正しく推論される", ()
     author: { type: "relation"; required: true }
   }
 
-  // モックのfileSystemとpathSystem
   const mockFileSystem = {
     getBasePath: () => "/base",
     readFile: async () => null,
@@ -40,7 +40,6 @@ test("DocFileMdReference - ジェネリック型が正しく推論される", ()
     config: defaultTestConfig,
   })
 
-  // 型が正しく推論されることを確認
   expectType<DocFileMdReference<TestSchema>>(ref)
 })
 
@@ -52,56 +51,45 @@ test("updateFrontMatter - 型安全な更新", () => {
     tags: { type: "multi-text"; required: false }
   }
 
-  // 型レベルのテスト
   type UpdateTest1 = Parameters<DocFileMdReference<TestSchema>["updateFrontMatter"]>
-  // 第1引数は TestSchema のキー
   type Key = UpdateTest1[0]
   assertType<Equals<Key, keyof TestSchema>>()
-
-  // 第2引数は対応する値の型
-  // title: string, count: number | null, tags: string[] | null に対応
 })
 
-test("read メソッドの戻り値の型", () => {
+test("read メソッドの戻り値の型 - throwする（Errorを含まない）", () => {
   type TestSchema = {
     title: { type: "text"; required: true }
     description: { type: "text"; required: false }
   }
 
-  // read の戻り値の型をテスト
   type ReadResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["read"]>>
 
-  // DocFileMdEntity<TestSchema> または Error
-  assertType<Equals<ReadResult, DocFileMdEntity<TestSchema> | Error>>()
+  assertType<Equals<ReadResult, DocFileMdEntity<TestSchema>>>()
 })
 
-test("readFrontMatter メソッドの戻り値の型", () => {
+test("readFrontMatter メソッドの戻り値の型 - throwする", () => {
   type TestSchema = {
     author: { type: "text"; required: true }
     tags: { type: "multi-text"; required: false }
   }
 
-  // readFrontMatter の戻り値の型をテスト
   type ReadFrontMatterResult = Awaited<
     ReturnType<DocFileMdReference<TestSchema>["readFrontMatter"]>
   >
 
-  // DocFileMdMetaValue<TestSchema> または Error
-  assertType<Equals<ReadFrontMatterResult, DocFileMdMetaValue<TestSchema> | Error>>()
+  assertType<Equals<ReadFrontMatterResult, DocFileMdMetaValue<TestSchema>>>()
 })
 
-test("relation メソッドの型推論", () => {
+test("relation メソッドの型推論 - null | T（Errorなし）", () => {
   type TestSchema = {
     author: { type: "relation"; required: true }
     reviewer: { type: "relation"; required: false }
     tags: { type: "multi-text"; required: false }
   }
 
-  // relation メソッドの戻り値の型
   type RelationResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["relation"]>>
 
-  // DocFileMdReference<DocCustomSchema> | Error | null (デフォルトのスキーマ)
-  assertType<Equals<RelationResult, DocFileMdReference<DocCustomSchema> | Error | null>>()
+  assertType<Equals<RelationResult, DocFileMdReference<DocCustomSchema> | null>>()
 })
 
 test("relations メソッドの型推論", () => {
@@ -110,10 +98,8 @@ test("relations メソッドの型推論", () => {
     tags: { type: "multi-text"; required: false }
   }
 
-  // relations メソッドの戻り値の型
   type RelationsResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["relations"]>>
 
-  // DocFileMdReference<DocCustomSchema>[] (デフォルトのスキーマを持つ参照の配列)
   assertType<Equals<RelationsResult, DocFileMdReference<DocCustomSchema>[]>>()
 })
 
@@ -122,7 +108,6 @@ test("directory メソッドの型推論", () => {
     title: { type: "text"; required: true }
   }
 
-  // directory メソッドの戻り値の型
   type _DirectoryResult = ReturnType<DocFileMdReference<TestSchema>["directory"]>
 })
 
@@ -131,51 +116,35 @@ test("directoryIndex メソッドの型推論", () => {
     content: { type: "text"; required: true }
   }
 
-  // directoryIndex メソッドの戻り値の型
   type _DirectoryIndexResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["directoryIndex"]>>
 })
 
-test("archive と restore メソッドの型保持", () => {
+test("archive と restore メソッドの型 - throwする（Errorなし）", () => {
   type TestSchema = {
     title: { type: "text"; required: true }
     archived: { type: "boolean"; required: false }
   }
 
-  // archive メソッドの戻り値の型
   type ArchiveResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["archive"]>>
-
-  // 同じスキーマを持つ新しい参照を返す
   assertType<Equals<ArchiveResult, DocFileMdReference<TestSchema>>>()
 
-  // restore メソッドの戻り値の型
   type RestoreResult = Awaited<ReturnType<DocFileMdReference<TestSchema>["restore"]>>
-
-  // 同じスキーマを持つ新しい参照を返す
   assertType<Equals<RestoreResult, DocFileMdReference<TestSchema>>>()
 })
 
 test("複雑なスキーマでの型安全性", () => {
   type _ComplexSchema = {
-    // 基本フィールド
     id: { type: "text"; required: true }
     title: { type: "text"; required: true }
     description: { type: "text"; required: false }
-
-    // 数値と真偽値
     viewCount: { type: "number"; required: true }
     rating: { type: "number"; required: false }
     isPublished: { type: "boolean"; required: true }
     isFeatured: { type: "boolean"; required: false }
-
-    // 選択フィールド
     status: { type: "select-text"; required: true }
     priority: { type: "select-number"; required: false }
-
-    // リレーション
     author: { type: "relation"; required: true }
     reviewer: { type: "relation"; required: false }
-
-    // 複数値フィールド
     tags: { type: "multi-text"; required: true }
     categories: { type: "multi-text"; required: false }
     scores: { type: "multi-number"; required: false }
@@ -183,4 +152,150 @@ test("複雑なスキーマでの型安全性", () => {
     statuses: { type: "multi-select-text"; required: false }
     priorities: { type: "multi-select-number"; required: false }
   }
+})
+
+test("DocFileMdReference - archiveがファイルを移動する", async () => {
+  const fileSystem = DocFileSystemMock.createWithFiles({
+    fileContents: { "docs/guide/intro.md": "# Intro\n\nContent here." },
+  })
+
+  const ref = new DocFileMdReference({
+    path: "docs/guide/intro.md",
+    fileSystem,
+    pathSystem: fileSystem.getPathSystem(),
+    customSchema: {},
+    config: defaultTestConfig,
+  })
+
+  const archivedRef = await ref.archive()
+
+  expect(archivedRef.path).toBe("docs/guide/_/intro.md")
+})
+
+test("DocFileMdReference - restoreがアーカイブ外でthrowする", async () => {
+  const fileSystem = DocFileSystemMock.createWithFiles({
+    fileContents: { "docs/guide/intro.md": "# Intro" },
+  })
+
+  const ref = new DocFileMdReference({
+    path: "docs/guide/intro.md",
+    fileSystem,
+    pathSystem: fileSystem.getPathSystem(),
+    customSchema: {},
+    config: defaultTestConfig,
+  })
+
+  expect(async () => await ref.restore()).toThrow()
+})
+
+test("DocFileMdReference - safe.restoreがアーカイブ外でErrorを返す", async () => {
+  const fileSystem = DocFileSystemMock.createWithFiles({
+    fileContents: { "docs/guide/intro.md": "# Intro" },
+  })
+
+  const ref = new DocFileMdReference({
+    path: "docs/guide/intro.md",
+    fileSystem,
+    pathSystem: fileSystem.getPathSystem(),
+    customSchema: {},
+    config: defaultTestConfig,
+  })
+
+  const safeResult = await ref.safe.restore()
+  expect(safeResult).toBeInstanceOf(Error)
+})
+
+test("DocFileMdReference - restoreがアーカイブ内のファイルを復元する", async () => {
+  const fileSystem = DocFileSystemMock.createWithFiles({
+    fileContents: { "docs/guide/_/intro.md": "# Intro" },
+  })
+
+  const ref = new DocFileMdReference({
+    path: "docs/guide/_/intro.md",
+    fileSystem,
+    pathSystem: fileSystem.getPathSystem(),
+    customSchema: {},
+    config: defaultTestConfig,
+  })
+
+  const restoredRef = await ref.restore()
+
+  expect(restoredRef.path).toBe("docs/guide/intro.md")
+})
+
+test("DocFileMdReference - read/write ラウンドトリップ", async () => {
+  const fileSystem = DocFileSystemMock.createWithFiles({
+    fileContents: {
+      "docs/guide/intro.md": [
+        "---",
+        "title: Hello",
+        "---",
+        "",
+        "# Intro",
+        "",
+        "Some content.",
+      ].join("\n"),
+    },
+  })
+
+  const schema = {
+    title: { type: "text" as const, required: true },
+  }
+
+  const ref = new DocFileMdReference({
+    path: "docs/guide/intro.md",
+    fileSystem,
+    pathSystem: fileSystem.getPathSystem(),
+    customSchema: schema,
+    config: defaultTestConfig,
+  })
+
+  const entity = await ref.read()
+
+  expect(entity.content().title).toBe("Intro")
+  expect(entity.content().meta().field("title")).toBe("Hello")
+
+  const updated = entity.withTitle("New Title")
+  await ref.write(updated)
+
+  const reread = await ref.read()
+
+  expect(reread.content().title).toBe("New Title")
+})
+
+test("DocFileMdReference - safe.readがT|Errorを返す", async () => {
+  const fileSystem = DocFileSystemMock.createWithFiles({
+    fileContents: { "docs/hello.md": "# Hello" },
+  })
+
+  const ref = new DocFileMdReference({
+    path: "docs/hello.md",
+    fileSystem,
+    pathSystem: fileSystem.getPathSystem(),
+    customSchema: {},
+    config: defaultTestConfig,
+  })
+
+  const safeResult = await ref.safe.read()
+
+  if (safeResult instanceof Error) {
+    throw safeResult
+  }
+
+  expect(safeResult.content().title).toBe("Hello")
+})
+
+test("DocFileMdReference - safe.readが存在しないファイルでErrorを返す", async () => {
+  const fileSystem = DocFileSystemMock.createWithFiles({})
+
+  const ref = new DocFileMdReference({
+    path: "docs/missing.md",
+    fileSystem,
+    pathSystem: fileSystem.getPathSystem(),
+    customSchema: {},
+    config: defaultTestConfig,
+  })
+
+  const safeResult = await ref.safe.read()
+  expect(safeResult).toBeInstanceOf(Error)
 })

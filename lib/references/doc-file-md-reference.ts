@@ -1,3 +1,4 @@
+import { createSafeProxy, type Safe } from "../create-safe-proxy"
 import { DocFileMdEntity } from "../entities/doc-file-md-entity"
 import type { DocFileSystemInterface } from "../modules/file-system/doc-file-system.interface"
 import type { DocPathSystem } from "../modules/path-system/doc-path-system"
@@ -35,6 +36,10 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     this.pathSystem = props.pathSystem
     this.customSchema = props.customSchema
     Object.freeze(this)
+  }
+
+  get safe(): Safe<this> {
+    return createSafeProxy(this)
   }
 
   get fileSystem(): DocFileSystemInterface {
@@ -83,11 +88,11 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     return this.fileSystem.exists(archivePath)
   }
 
-  async read(): Promise<DocFileMdEntity<T> | Error> {
+  async read(): Promise<DocFileMdEntity<T>> {
     const content = await this.fileSystem.readFile(this.path)
 
     if (content instanceof Error) {
-      return content
+      throw content
     }
 
     const actualPath = this.path
@@ -96,7 +101,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
       const archivedContent = await this.fileSystem.readFile(this.archivedPath)
 
       if (archivedContent instanceof Error) {
-        return archivedContent
+        throw archivedContent
       }
 
       if (archivedContent !== null) {
@@ -119,7 +124,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     }
 
     if (content === null) {
-      return new Error(`File not found at ${this.path} or in archive.`)
+      throw new Error(`File not found at ${this.path} or in archive.`)
     }
 
     const contentValue = DocFileMdContentValue.fromMarkdown(content, this.customSchema)
@@ -143,14 +148,8 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     )
   }
 
-  /**
-   * Read file content
-   */
-  async readText(): Promise<Error | string> {
+  async readText(): Promise<string> {
     const entity = await this.read()
-    if (entity instanceof Error) {
-      return entity
-    }
     return entity.value.content.body
   }
 
@@ -173,57 +172,57 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     )
   }
 
-  /**
-   * Write entity
-   */
-  async write(entity: DocFileMdEntity<T>): Promise<Error | null> {
+  async write(entity: DocFileMdEntity<T>): Promise<void> {
     const content = entity.content().toText()
     const writeResult = await this.fileSystem.writeFile(this.path, content)
 
     if (writeResult instanceof Error) {
-      return writeResult
+      throw writeResult
     }
-
-    return null
   }
 
-  async writeText(text: string): Promise<Error | null> {
-    return await this.fileSystem.writeFile(this.path, text)
+  async writeText(text: string): Promise<void> {
+    const writeResult = await this.fileSystem.writeFile(this.path, text)
+
+    if (writeResult instanceof Error) {
+      throw writeResult
+    }
   }
 
-  /**
-   * Create new file with default content
-   */
-  async writeDefault(): Promise<Error | null> {
+  async writeDefault(): Promise<void> {
     const fileName = this.pathSystem.basename(this.path, ".md")
     const defaultContent = [`# ${fileName}`, "", "Write your content here."].join("\n")
-    return await this.fileSystem.writeFile(this.path, defaultContent)
+    const writeResult = await this.fileSystem.writeFile(this.path, defaultContent)
+
+    if (writeResult instanceof Error) {
+      throw writeResult
+    }
   }
 
-  /**
-   * Delete file
-   */
-  async delete(): Promise<Error | null> {
-    return await this.fileSystem.deleteFile(this.path)
+  async delete(): Promise<void> {
+    const deleteResult = await this.fileSystem.deleteFile(this.path)
+
+    if (deleteResult instanceof Error) {
+      throw deleteResult
+    }
   }
 
-  /**
-   * Copy file
-   */
-  async copyTo(destinationPath: string): Promise<Error | null> {
-    return await this.fileSystem.copyFile(this.path, destinationPath)
+  async copyTo(destinationPath: string): Promise<void> {
+    const copyResult = await this.fileSystem.copyFile(this.path, destinationPath)
+
+    if (copyResult instanceof Error) {
+      throw copyResult
+    }
   }
 
-  /**
-   * Move file
-   */
-  async moveTo(destinationPath: string): Promise<Error | null> {
-    return await this.fileSystem.moveFile(this.path, destinationPath)
+  async moveTo(destinationPath: string): Promise<void> {
+    const moveResult = await this.fileSystem.moveFile(this.path, destinationPath)
+
+    if (moveResult instanceof Error) {
+      throw moveResult
+    }
   }
 
-  /**
-   * Move file to archive and return new reference
-   */
   async archive(
     archiveDirectoryName = this.props.config.archiveDirectoryName,
   ): Promise<DocFileMdReference<T>> {
@@ -233,10 +232,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const archivePath = this.pathSystem.join(dirPath, archiveDirectoryName, fileName)
 
-    const moveResult = await this.moveTo(archivePath)
-    if (moveResult instanceof Error) {
-      throw moveResult
-    }
+    await this.moveTo(archivePath)
 
     return new DocFileMdReference({
       path: archivePath,
@@ -247,9 +243,6 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * Restore file from archive and return new reference
-   */
   async restore(
     archiveDirectoryName = this.props.config.archiveDirectoryName,
   ): Promise<DocFileMdReference<T>> {
@@ -265,10 +258,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const restorePath = this.pathSystem.join(this.pathSystem.dirname(dirPath), fileName)
 
-    const moveResult = await this.moveTo(restorePath)
-    if (moveResult instanceof Error) {
-      throw moveResult
-    }
+    await this.moveTo(restorePath)
 
     return new DocFileMdReference({
       path: restorePath,
@@ -279,25 +269,34 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * Get file size in bytes
-   */
-  async size(): Promise<number | Error> {
-    return this.fileSystem.getFileSize(this.path)
+  async size(): Promise<number> {
+    const fileSize = await this.fileSystem.getFileSize(this.path)
+
+    if (fileSize instanceof Error) {
+      throw fileSize
+    }
+
+    return fileSize
   }
 
-  /**
-   * Get file last modified time
-   */
-  async lastModified(): Promise<Date | Error> {
-    return this.fileSystem.getFileUpdatedTime(this.path)
+  async lastModified(): Promise<Date> {
+    const updatedTime = await this.fileSystem.getFileUpdatedTime(this.path)
+
+    if (updatedTime instanceof Error) {
+      throw updatedTime
+    }
+
+    return updatedTime
   }
 
-  /**
-   * Get file creation time
-   */
-  async createdAt(): Promise<Date | Error> {
-    return this.fileSystem.getFileCreatedTime(this.path)
+  async createdAt(): Promise<Date> {
+    const createdTime = await this.fileSystem.getFileCreatedTime(this.path)
+
+    if (createdTime instanceof Error) {
+      throw createdTime
+    }
+
+    return createdTime
   }
 
   directory(): DocDirectoryReference<T> {
@@ -327,22 +326,13 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * Get relation based on schema
-   */
   async relation<U extends DocCustomSchema = DocCustomSchema>(
     key: RelationKeys<T>,
     targetSchema?: U,
-  ): Promise<DocFileMdReference<U> | Error | null> {
+  ): Promise<DocFileMdReference<U> | null> {
     const file = await this.read()
-    if (file instanceof Error) {
-      return file
-    }
 
-    const relationValue = file
-      .content()
-      .meta()
-      .field(key as string)
+    const relationValue = file.content().meta().relation(key)
 
     if (relationValue === null) {
       return null
@@ -356,28 +346,25 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const indexFile = await indexRef.read()
 
-    if (indexFile instanceof Error) {
-      return null
-    }
-
     const schemaValue = indexFile.content.meta().schema()
+    const keyStr = key as string
+    const fieldValue = schemaValue.value[keyStr]
 
-    const fieldValue = schemaValue.value[key as string as keyof typeof schemaValue.value]
     if (!fieldValue || fieldValue.type !== "relation") {
       return null
     }
 
-    const schemaField = schemaValue.field(key as string as keyof typeof schemaValue.customSchema)
-    const relationField = schemaField as unknown as { path: string }
+    const relationField = schemaValue.relation(key)
     let resolvedPath = relationField.path
 
-    if (relationField.path.startsWith("..")) {
-      resolvedPath = this.pathSystem.join(this.directoryPath, relationField.path)
+    if (resolvedPath.startsWith("..")) {
+      resolvedPath = this.pathSystem.join(this.directoryPath, resolvedPath)
       resolvedPath = this.pathSystem.normalize(resolvedPath)
     }
 
     const fullPath = this.pathSystem.join(resolvedPath, `${relationValue}.md`)
 
+    // U defaults to DocCustomSchema, so {} satisfies the constraint
     return new DocFileMdReference<U>({
       path: fullPath,
       fileSystem: this.fileSystem,
@@ -387,9 +374,6 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * Get index.md in the same directory
-   */
   async directoryIndex(): Promise<DocFileIndexReference<T> | null> {
     const indexPath = this.pathSystem.join(this.directoryPath, "index.md")
 
@@ -422,18 +406,11 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     return null
   }
 
-  /**
-   * Get multiple relations based on schema
-   */
   async relations<U extends DocCustomSchema = DocCustomSchema>(
     key: MultiRelationKeys<T>,
     customSchema?: U,
   ): Promise<DocFileMdReference<U>[]> {
     const file = await this.read()
-
-    if (file instanceof Error) {
-      return []
-    }
 
     const meta = file.content().meta()
 
@@ -457,10 +434,6 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const indexFile = await indexRef.read()
 
-    if (indexFile instanceof Error) {
-      return []
-    }
-
     const indexSchema = indexFile.content.meta().schema()
 
     const indexSchemaField = indexSchema.multiRelation(key)
@@ -478,31 +451,16 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * File: Markdown > FrontMatter
-   */
-  async readFrontMatter(): Promise<DocFileMdMetaValue<T> | Error> {
+  async readFrontMatter(): Promise<DocFileMdMetaValue<T>> {
     const entity = await this.read()
-
-    if (entity instanceof Error) {
-      return entity
-    }
-
     return entity.content().meta()
   }
 
-  /**
-   * File: Markdown > FrontMatter
-   */
   async updateFrontMatter<K extends keyof T>(
     key: K,
     value: BaseFieldValueType<ExtractFieldType<T[K]>>,
-  ): Promise<this | Error> {
+  ): Promise<this> {
     const entity = await this.read()
-
-    if (entity instanceof Error) {
-      return entity
-    }
 
     const frontMatter = entity.content().meta()
 

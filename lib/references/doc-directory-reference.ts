@@ -1,3 +1,4 @@
+import { createSafeProxy, type Safe } from "../create-safe-proxy"
 import type { DocFileDirectoryEntity } from "@/entities/doc-file-entity"
 import type { DocFileDirectoryReference } from "@/references/doc-file-reference"
 import { DocFileIndexEntity } from "../entities/doc-file-index-entity"
@@ -32,6 +33,10 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     this.pathSystem = props.pathSystem
     this.customSchema = props.customSchema
     Object.freeze(this)
+  }
+
+  get safe(): Safe<this> {
+    return createSafeProxy(this)
   }
 
   get fileSystem(): DocFileSystemInterface {
@@ -84,17 +89,17 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     return this.pathSystem.basename(this.path)
   }
 
-  async fileNames(): Promise<string[] | Error> {
+  async fileNames(): Promise<string[]> {
     const filePaths = await this.fileSystem.readDirectoryFilePaths(this.relativePath)
 
     if (filePaths instanceof Error) {
-      return filePaths
+      throw filePaths
     }
 
     return filePaths.map((p) => this.pathSystem.basename(p)).filter((name) => name.includes("."))
   }
 
-  async archivedFileNames(): Promise<string[] | Error> {
+  async archivedFileNames(): Promise<string[]> {
     const archivePath = this.pathSystem.join(this.relativePath, this.archiveDirectoryName)
 
     const filePaths = await this.fileSystem.readDirectoryFilePaths(archivePath)
@@ -107,12 +112,9 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
   }
 
   async *filesGenerator(): AsyncGenerator<DocFileDirectoryReference<T>, void, unknown> {
-    const fileNames = await this.fileNames()
+    const allFileNames = await this.fileNames()
 
-    if (fileNames instanceof Error) return
-
-    // Process regular files
-    for (const fileName of fileNames) {
+    for (const fileName of allFileNames) {
       if (fileName === "index.md") continue
       if (fileName.endsWith(".md")) {
         yield new DocFileMdReference({
@@ -133,12 +135,9 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
       })
     }
 
-    const archivedFileNames = await this.archivedFileNames()
+    const archivedNames = await this.archivedFileNames()
 
-    if (archivedFileNames instanceof Error) return
-
-    // Process archived files
-    for (const fileName of archivedFileNames) {
+    for (const fileName of archivedNames) {
       if (fileName === this.indexFileName) continue
       if (fileName.endsWith(".md")) {
         yield new DocFileMdReference({
@@ -160,14 +159,8 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     }
   }
 
-  async *mdFilesGenerator(): AsyncGenerator<DocFileMdReference<T> | Error, void, unknown> {
-    const generator = this.filesGenerator()
-
-    for await (const file of generator) {
-      if (file instanceof Error) {
-        yield file
-        return
-      }
+  async *mdFilesGenerator(): AsyncGenerator<DocFileMdReference<T>, void, unknown> {
+    for await (const file of this.filesGenerator()) {
       if (file instanceof DocFileMdReference) {
         yield file
       }
@@ -175,21 +168,19 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
   }
 
   async files(): Promise<DocFileDirectoryReference<T>[]> {
-    const files: DocFileDirectoryReference<T>[] = []
+    const allFiles: DocFileDirectoryReference<T>[] = []
 
     for await (const ref of this.filesGenerator()) {
-      if (ref instanceof Error) continue
-      files.push(ref)
+      allFiles.push(ref)
     }
 
-    return files
+    return allFiles
   }
 
   async mdFiles(): Promise<DocFileMdReference<T>[]> {
     const refs: DocFileMdReference<T>[] = []
 
     for await (const file of this.mdFilesGenerator()) {
-      if (file instanceof Error) continue
       refs.push(file)
     }
 
@@ -236,9 +227,12 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     const entities: DocFileDirectoryEntity<T>[] = []
 
     for await (const file of this.filesGenerator()) {
-      const entity = await file.read()
-      if (entity instanceof Error) continue
-      entities.push(entity)
+      try {
+        const entity = await file.read()
+        entities.push(entity)
+      } catch {
+        continue
+      }
     }
 
     return entities
@@ -248,10 +242,13 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     const entities: DocFileMdEntity<T>[] = []
 
     for await (const file of this.filesGenerator()) {
-      const entity = await file.read()
-      if (entity instanceof Error) continue
-      if (entity instanceof DocFileUnknownEntity) continue
-      entities.push(entity)
+      try {
+        const entity = await file.read()
+        if (entity instanceof DocFileUnknownEntity) continue
+        entities.push(entity)
+      } catch {
+        continue
+      }
     }
 
     return entities
@@ -261,18 +258,18 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     const entities: DocFileUnknownEntity[] = []
 
     for await (const file of this.filesGenerator()) {
-      const entity = await file.read()
-      if (entity instanceof Error) continue
-      if (entity instanceof DocFileMdEntity) continue
-      entities.push(entity)
+      try {
+        const entity = await file.read()
+        if (entity instanceof DocFileMdEntity) continue
+        entities.push(entity)
+      } catch {
+        continue
+      }
     }
 
     return entities
   }
 
-  /**
-   * Get list of subdirectory names
-   */
   async directoryNames(): Promise<string[]> {
     const allFileNames = await this.fileSystem.readDirectoryFileNames(this.relativePath)
 
@@ -280,36 +277,27 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
       return []
     }
 
-    const directoryNames: string[] = []
+    const names: string[] = []
 
     for (const fileName of allFileNames) {
       if (fileName.startsWith(this.archiveDirectoryName)) continue
-
-      // Check if directory is in exclusion list
       if (this.props.config.directoryExcludes.includes(fileName)) continue
 
       const filePath = this.pathSystem.join(this.relativePath, fileName)
       const isDirectory = await this.fileSystem.isDirectory(filePath)
 
       if (isDirectory) {
-        directoryNames.push(fileName)
+        names.push(fileName)
       }
     }
 
-    return directoryNames
+    return names
   }
 
-  /**
-   * Get subdirectory references
-   */
   async directories(): Promise<DocDirectoryReference<T>[]> {
-    const directoryNames = await this.directoryNames()
+    const names = await this.directoryNames()
 
-    if (directoryNames instanceof Error) {
-      return []
-    }
-
-    return directoryNames.map((dirName) => {
+    return names.map((dirName) => {
       const dirPath = this.pathSystem.join(this.relativePath, dirName)
 
       return new DocDirectoryReference<T>({
@@ -324,9 +312,6 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     })
   }
 
-  /**
-   * Get single subdirectory reference
-   */
   directory(directoryName: string): DocDirectoryReference<T>
 
   directory<S extends DocCustomSchema>(
@@ -373,13 +358,13 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     })
   }
 
-  async readIndexFile(): Promise<DocFileIndexEntity<T> | Error> {
+  async readIndexFile(): Promise<DocFileIndexEntity<T>> {
     return this.indexFile().read()
   }
 
   async writeFile(
     entity: DocFileIndexEntity<T> | DocFileMdEntity<T> | DocFileUnknownEntity,
-  ): Promise<Error | null> {
+  ): Promise<void> {
     const filePath = this.pathSystem.join(this.relativePath, entity.value.path.nameWithExtension)
 
     let content: string | null = null
@@ -397,29 +382,23 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     }
 
     if (content === null) {
-      return new Error("Entity content is undefined")
+      throw new Error("Entity content is undefined")
     }
 
     const writeResult = await this.fileSystem.writeFile(filePath, content)
 
     if (writeResult instanceof Error) {
-      return writeResult
+      throw writeResult
     }
-
-    return null
   }
 
   async exists(): Promise<boolean> {
     return await this.fileSystem.exists(this.relativePath)
   }
 
-  /**
-   * Create new Markdown file
-   */
   async createMdFile(fileName?: string): Promise<DocFileMdReference<T>> {
     const actualFileName = fileName || this.uniqueFileName("document")
 
-    // Add .md extension if not present
     const mdFileName = actualFileName.endsWith(".md") ? actualFileName : `${actualFileName}.md`
 
     const filePath = this.pathSystem.join(this.relativePath, mdFileName)
@@ -432,18 +411,11 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
       config: this.props.config,
     })
 
-    const writeResult = await fileRef.writeDefault()
-
-    if (writeResult instanceof Error) {
-      throw writeResult
-    }
+    await fileRef.writeDefault()
 
     return fileRef
   }
 
-  /**
-   * Generate unique filename
-   */
   private uniqueFileName(prefix = "document"): string {
     const [uuid] = crypto.randomUUID().split("-")
 

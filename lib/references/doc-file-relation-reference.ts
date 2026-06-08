@@ -1,3 +1,4 @@
+import { createSafeProxy, type Safe } from "../create-safe-proxy"
 import { DocFileMdEntity } from "../entities/doc-file-md-entity"
 import type { DocFileSystemInterface } from "../modules/file-system/doc-file-system.interface"
 import type { DocPathSystem } from "../modules/path-system/doc-path-system"
@@ -24,6 +25,10 @@ export class DocFileRelationReference {
     Object.freeze(this)
   }
 
+  get safe(): Safe<this> {
+    return createSafeProxy(this)
+  }
+
   get fileSystem(): DocFileSystemInterface {
     return this.props.fileSystem
   }
@@ -32,26 +37,16 @@ export class DocFileRelationReference {
     return this.fileSystem.getBasePath()
   }
 
-  /**
-   * Relation path
-   */
   get path(): string {
     return this.props.filePath
   }
 
-  /**
-   * Full path
-   */
   get fullPath(): string {
     return this.pathSystem.join(this.fileSystem.getBasePath(), this.props.filePath)
   }
 
-  async read(): Promise<DocRelationValue | Error | null> {
+  async read(): Promise<DocRelationValue | null> {
     const files = await this.readFiles()
-
-    if (files instanceof Error) {
-      return files
-    }
 
     return new DocRelationValue({
       path: this.path,
@@ -59,11 +54,7 @@ export class DocFileRelationReference {
     } satisfies DocRelation)
   }
 
-  /**
-   * Read list of relation files
-   */
-  async readFiles(): Promise<DocRelationFileValue[] | Error> {
-    // fileSystemのexistsとreadDirectoryFilePathsは既にbasePathからの相対パスを期待している
+  async readFiles(): Promise<DocRelationFileValue[]> {
     const exists = await this.fileSystem.exists(this.path)
 
     if (!exists) {
@@ -73,16 +64,13 @@ export class DocFileRelationReference {
     const filePaths = await this.fileSystem.readDirectoryFilePaths(this.path)
 
     if (filePaths instanceof Error) {
-      return filePaths
+      throw filePaths
     }
 
     const files: DocRelationFileValue[] = []
 
     for (const filePath of filePaths) {
       const file = await this.readFile(filePath)
-      if (file instanceof Error) {
-        return file
-      }
       if (file === null) {
         continue
       }
@@ -92,15 +80,11 @@ export class DocFileRelationReference {
     return files
   }
 
-  /**
-   * Read single relation file
-   */
-  async readFile(filePath: string): Promise<DocRelationFileValue | Error | null> {
+  async readFile(filePath: string): Promise<DocRelationFileValue | null> {
     if (filePath.includes("index.md")) {
       return null
     }
 
-    // Skip directories
     if (!filePath.endsWith(".md")) {
       return null
     }
@@ -108,7 +92,7 @@ export class DocFileRelationReference {
     const content = await this.fileSystem.readFile(filePath)
 
     if (content instanceof Error) {
-      return content
+      throw content
     }
 
     if (content === null) {
@@ -132,50 +116,23 @@ export class DocFileRelationReference {
     return DocRelationFileValue.from(filePath, fileEntity.value.content.title)
   }
 
-  /**
-   * Check if file exists
-   */
   async exists(slug: string): Promise<boolean> {
     const filePath = `${this.path}/${slug}.md`
     return this.fileSystem.exists(filePath)
   }
 
-  /**
-   * Get list of file names (without extension)
-   */
-  async readSlugs(): Promise<string[] | Error> {
+  async readSlugs(): Promise<string[]> {
     const files = await this.readFiles()
-
-    if (files instanceof Error) {
-      return files
-    }
-
     return files.map((file) => file.id)
   }
 
-  /**
-   * Get file count
-   */
-  async count(): Promise<number | Error> {
+  async count(): Promise<number> {
     const files = await this.readFiles()
-
-    if (files instanceof Error) {
-      return files
-    }
-
     return files.length
   }
 
-  /**
-   * Check if empty
-   */
-  async isEmpty(): Promise<boolean | Error> {
-    const count = await this.count()
-
-    if (count instanceof Error) {
-      return count
-    }
-
-    return count === 0
+  async isEmpty(): Promise<boolean> {
+    const fileCount = await this.count()
+    return fileCount === 0
   }
 }

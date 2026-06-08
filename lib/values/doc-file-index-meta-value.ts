@@ -1,6 +1,6 @@
 import { parse, stringify } from "yaml"
 import { INDEX_META } from "@/constants"
-import { zDocFileIndexMeta } from "@/models"
+import { zDocFileIndexMeta, zDocFileIndexSchema } from "@/models"
 import type {
   DocClientConfig,
   DocCustomSchema,
@@ -73,17 +73,22 @@ export class DocFileIndexMetaValue<T extends DocCustomSchema> {
    * Return a new instance with an unknown schema
    * Allows accepting Record<string, unknown> schemas from external sources
    */
-  withUnknownSchema(draft: Record<string, unknown>): DocFileIndexMetaValue<DocCustomSchema> {
-    // Cast the unknown schema to the expected type
-    const typedSchema = draft as DocFileIndexSchema<string>
+  withUnknownSchema(
+    draft: Record<string, unknown>,
+  ): DocFileIndexMetaValue<DocCustomSchema> {
+    const parseResult = zDocFileIndexSchema.safeParse(draft)
+
+    if (parseResult.success === false) {
+      throw new Error(`Invalid schema format: ${parseResult.error.message}`)
+    }
 
     return new DocFileIndexMetaValue<DocCustomSchema>(
       {
         type: INDEX_META,
         icon: this.value.icon,
-        schema: typedSchema,
+        schema: parseResult.data,
       },
-      {} as DocCustomSchema,
+      {},
       this.config,
       this.additionalProperties,
     )
