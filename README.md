@@ -1,15 +1,16 @@
 # @interactive-inc/docs-client
 
-A TypeScript library for managing Markdown-based documentation with schema validation, file operations, and multiple storage backends.
+Markdown ベースのドキュメントを型安全に管理する TypeScript ライブラリ。
 
 ## Features
 
-- Read, write, and manage Markdown files with FrontMatter metadata
-- Type-safe schema definition with Zod validation
-- Support for relations between documents
-- Multiple file system backends (Node.js, GitHub, JSON, Mock)
-- Archive/restore functionality for documents
-- File tree generation
+- Markdown ファイルの読み書きと FrontMatter メタデータ管理
+- Zod スキーマによる型安全なバリデーション
+- ドキュメント間のリレーション
+- 複数ストレージバックエンド（Node.js, GitHub, JSON, Mock）
+- アーカイブ/リストア
+- ファイルツリー生成
+- `.safe` プロキシによるエラーハンドリング
 
 ## Installation
 
@@ -28,13 +29,20 @@ import { DocFileSystemNode } from "@interactive-inc/docs-client/file-system-node
 const fileSystem = new DocFileSystemNode({ basePath: "./docs" })
 const client = new DocClient({ fileSystem })
 
-// Read a markdown file
-const fileRef = client.mdFile("articles/hello.md")
-const entity = await fileRef.read()
+// .safe を使うと throw の代わりに Error を返す
+const entity = await client.safe.mdFile("articles/hello.md").read()
 
 if (!(entity instanceof Error)) {
   console.log(entity.content().title)
   console.log(entity.content().body)
+}
+
+// try/catch でも使える
+try {
+  const entity = await client.mdFile("articles/hello.md").read()
+  console.log(entity.content().title)
+} catch (error) {
+  console.error(error)
 }
 ```
 
@@ -42,18 +50,18 @@ if (!(entity instanceof Error)) {
 
 ### DocClient
 
-The main entry point for interacting with documents.
+メインのエントリポイント。
 
 ```typescript
 const client = new DocClient({
   fileSystem,
   config: {
-    defaultIndexIcon: "📁",
+    defaultIndexIcon: "📃",
     indexFileName: "index.md",
     archiveDirectoryName: "_",
     defaultDirectoryName: "Directory",
     indexMetaIncludes: [],
-    directoryExcludes: [".git"],
+    directoryExcludes: [".vitepress"],
     metaFileName: ".meta.json",
   },
 })
@@ -61,38 +69,50 @@ const client = new DocClient({
 
 ### References
 
-References are handles to files or directories. They do not load content until you call `read()`.
+ファイルやディレクトリへの遅延参照。`read()` を呼ぶまで I/O は発生しない。
 
 ```typescript
-// File reference
 const fileRef = client.mdFile("articles/hello.md")
 
-// Directory reference
 const dirRef = client.directory("articles")
 
-// Index file reference
 const indexRef = client.indexFile("articles")
 ```
 
 ### Entities
 
-Entities are immutable objects containing file content and metadata.
+読み取り後の不変データオブジェクト。
 
 ```typescript
 const entity = await fileRef.read()
 
-if (!(entity instanceof Error)) {
-  // Access content
-  const title = entity.content().title
-  const body = entity.content().body
-  const description = entity.content().description
+const title = entity.content().title
+const body = entity.content().body
+const description = entity.content().description
 
-  // Access metadata (FrontMatter)
-  const meta = entity.content().meta()
+const meta = entity.content().meta()
 
-  // Create modified copy (immutable)
-  const updated = entity.withTitle("New Title")
+// with*() で新しいインスタンスを作成（不変）
+const updated = entity.withTitle("New Title")
+```
+
+### Error Handling - `.safe` プロキシ
+
+Reference や DocClient のメソッドは通常 throw でエラーを伝播する。`.safe` プロキシを使うと、全 async メソッドが `T | Error` を返す。
+
+```typescript
+// throw する（try/catch が必要）
+const entity = await fileRef.read()
+
+// Error を返す（instanceof チェック）
+const entity = await fileRef.safe.read()
+
+if (entity instanceof Error) {
+  console.error(entity.message)
+  return
 }
+
+console.log(entity.content().title)
 ```
 
 ## File Operations
@@ -100,42 +120,38 @@ if (!(entity instanceof Error)) {
 ### Reading Files
 
 ```typescript
-// Read a single file
 const fileRef = client.mdFile("articles/hello.md")
 const entity = await fileRef.read()
 
-// Read all files in a directory
+// ディレクトリ内の全ファイルを読み取り
 const dirRef = client.directory("articles")
 const entities = await dirRef.readMdFiles()
 
-// Read file as raw text
+// 生テキストとして読み取り
 const text = await fileRef.readText()
 ```
 
 ### Writing Files
 
 ```typescript
-// Write an entity
 const entity = fileRef.empty()
 const updated = entity.withTitle("Hello World").withDescription("My first article")
 await fileRef.write(updated)
 
-// Write raw text
+// 生テキストで書き込み
 await fileRef.writeText("# Hello\n\nContent here")
 
-// Create a new file with default content
+// デフォルトコンテンツで新規ファイル作成
 await dirRef.createMdFile("new-article.md")
 ```
 
 ### Archive and Restore
 
-Files can be moved to an archive directory (default: `_/`).
+ファイルをアーカイブディレクトリ（デフォルト: `_/`）に移動。
 
 ```typescript
-// Archive a file (moves to _/ subdirectory)
 const archivedRef = await fileRef.archive()
 
-// Restore from archive
 const restoredRef = await archivedRef.restore()
 ```
 
@@ -150,11 +166,11 @@ const createdAt = await fileRef.createdAt()
 
 ## Schema Definition
 
-Define schemas to validate and type FrontMatter metadata.
+FrontMatter メタデータの構造をスキーマで定義する。
 
 ### Using .meta.json (Recommended)
 
-Create a `.meta.json` file in any directory:
+ディレクトリに `.meta.json` を配置:
 
 ```json
 {
@@ -196,7 +212,7 @@ Create a `.meta.json` file in any directory:
 
 ### Using index.md FrontMatter (Fallback)
 
-If `.meta.json` does not exist, schema is read from `index.md`:
+`.meta.json` がなければ `index.md` の FrontMatter からスキーマを読み取る:
 
 ```markdown
 ---
@@ -219,7 +235,7 @@ Directory description here.
 
 ### Type-Safe Schema in Code
 
-Use `defineSchema` for type-safe schema definitions:
+`defineSchema` で型安全にスキーマを定義:
 
 ```typescript
 import { defineSchema, docCustomSchemaField } from "@interactive-inc/docs-client"
@@ -234,49 +250,45 @@ const articleSchema = defineSchema({
   relatedArticles: docCustomSchemaField.multiRelation(false, "articles"),
 })
 
-// Use schema with directory
+// スキーマ付きでディレクトリを取得
 const dirRef = client.directory("articles", articleSchema)
 const fileRef = dirRef.mdFile("hello")
 const entity = await fileRef.read()
 
-if (!(entity instanceof Error)) {
-  // Type-safe access to metadata
-  const title = entity.content().meta().field("title") // string
-  const views = entity.content().meta().field("views") // number | null
-}
+// 型安全なメタデータアクセス
+const title = entity.content().meta().field("title") // string
+const views = entity.content().meta().field("views") // number | null
 ```
 
 ### Schema Field Types
 
-| Type                  | Value Type | Description                             |
-| --------------------- | ---------- | --------------------------------------- |
-| `text`                | `string`   | Single text value                       |
-| `number`              | `number`   | Numeric value                           |
-| `boolean`             | `boolean`  | True/false                              |
-| `select-text`         | `string`   | Single selection from text options      |
-| `select-number`       | `number`   | Single selection from number options    |
-| `multi-text`          | `string[]` | Multiple text values                    |
-| `multi-number`        | `number[]` | Multiple number values                  |
-| `multi-select-text`   | `string[]` | Multiple selections from text options   |
-| `multi-select-number` | `number[]` | Multiple selections from number options |
-| `relation`            | `string`   | Reference to another document           |
-| `multi-relation`      | `string[]` | References to multiple documents        |
+| Type | Value Type | Description |
+| --- | --- | --- |
+| `text` | `string` | 単一テキスト |
+| `number` | `number` | 数値 |
+| `boolean` | `boolean` | 真偽値 |
+| `select-text` | `string` | テキスト選択肢から単一選択 |
+| `select-number` | `number` | 数値選択肢から単一選択 |
+| `multi-text` | `string[]` | 複数テキスト |
+| `multi-number` | `number[]` | 複数数値 |
+| `multi-select-text` | `string[]` | テキスト選択肢から複数選択 |
+| `multi-select-number` | `number[]` | 数値選択肢から複数選択 |
+| `relation` | `string` | 他ドキュメントへの参照 |
+| `multi-relation` | `string[]` | 他ドキュメントへの複数参照 |
 
 ## Relations
 
-Relations link documents to each other.
+ドキュメント間のリレーション。
 
 ```typescript
-// Define schema with relations
 const pageSchema = defineSchema({
   features: docCustomSchemaField.multiRelation(true, "features"),
 })
 
 const dirRef = client.directory("pages", pageSchema)
 const pageRef = dirRef.mdFile("dashboard")
-const page = await pageRef.read()
 
-// Get related documents
+// 関連ドキュメントの参照を取得
 const featureRefs = await pageRef.relations("features")
 for (const featureRef of featureRefs) {
   const feature = await featureRef.read()
@@ -289,55 +301,63 @@ for (const featureRef of featureRefs) {
 ```typescript
 const dirRef = client.directory("articles")
 
-// List contents
+// 一覧取得
 const fileNames = await dirRef.fileNames()
 const dirNames = await dirRef.directoryNames()
 
-// Get references
+// 参照取得
 const files = await dirRef.files()
 const mdFiles = await dirRef.mdFiles()
 const subdirs = await dirRef.directories()
 
-// Read all files
+// 全ファイル読み取り
 const entities = await dirRef.readMdFiles()
 
-// Access index file
+// インデックスファイル読み取り
 const indexEntity = await dirRef.readIndexFile()
 
-// Navigate to subdirectory
+// サブディレクトリ
 const subDirRef = dirRef.directory("tutorials")
 
-// Create new file
+// 新規ファイル作成
 const newFileRef = await dirRef.createMdFile("new-article.md")
 ```
 
 ## File Tree
 
-Generate a hierarchical tree structure of documents.
+ドキュメントの階層ツリー構造を生成。
 
 ```typescript
-// Get full file tree
 const tree = await client.fileTree()
 
-// Get directory-only tree
 const dirTree = await client.directoryTree()
 
-// Tree node structure
-type DocTreeNode = {
-  type: "file" | "directory"
+// ツリーノードの型
+type DocTreeFileNode = {
+  type: "file"
   name: string
   path: string
   icon: string
   title: string
-  children?: DocTreeNode[] // Only for directories
 }
+
+type DocTreeDirectoryNode = {
+  type: "directory"
+  name: string
+  path: string
+  icon: string
+  title: string
+  children: DocTreeNode[]
+}
+
+type DocTreeNode = DocTreeFileNode | DocTreeDirectoryNode
 ```
 
 ## File Systems
 
 ### Node.js File System
 
-For local file operations:
+ローカルファイル操作用:
 
 ```typescript
 import { DocFileSystemNode } from "@interactive-inc/docs-client/file-system-node"
@@ -345,14 +365,26 @@ import { DocFileSystemNode } from "@interactive-inc/docs-client/file-system-node
 const fileSystem = new DocFileSystemNode({ basePath: "./docs" })
 ```
 
-### GitHub File System (Octokit)
-
-For reading from GitHub repositories:
+Read/Write を個別に指定する場合:
 
 ```typescript
+import { DocFileSystemNodeRead, DocFileSystemNodeWrite } from "@interactive-inc/docs-client/file-system-node"
 import { DocFileSystem } from "@interactive-inc/docs-client/file-system"
+
+const reader = new DocFileSystemNodeRead({ basePath: "./docs" })
+const writer = new DocFileSystemNodeWrite({ basePath: "./docs", reader })
+
+const fileSystem = new DocFileSystem({ basePath: "./docs", reader, writer })
+```
+
+### GitHub File System (Octokit)
+
+GitHub リポジトリからの読み取り:
+
+```typescript
 import { DocFileSystemOctokitRead } from "@interactive-inc/docs-client/file-system-octokit"
 import { DocFileSystemNodeWrite } from "@interactive-inc/docs-client/file-system-node"
+import { DocFileSystem } from "@interactive-inc/docs-client/file-system"
 
 const reader = new DocFileSystemOctokitRead({
   token: process.env.GITHUB_TOKEN,
@@ -375,14 +407,14 @@ const fileSystem = new DocFileSystem({
 
 ### JSON File System
 
-For in-memory operations with JSON data:
+インメモリ操作用:
 
 ```typescript
 import { DocFileSystemJson } from "@interactive-inc/docs-client/file-system-json"
 
 const fileSystem = new DocFileSystemJson({
   basePath: "docs",
-  files: {
+  data: {
     "index.md": "# Home\n\nWelcome!",
     "articles/hello.md": "# Hello\n\nContent here.",
   },
@@ -391,78 +423,13 @@ const fileSystem = new DocFileSystemJson({
 
 ### Mock File System
 
-For testing:
+テスト用:
 
 ```typescript
 import { DocFileSystemMock } from "@interactive-inc/docs-client/file-system-mock"
 
 const fileSystem = new DocFileSystemMock({ basePath: "docs" })
 ```
-
-## API Reference
-
-### DocClient
-
-| Method                 | Description                               |
-| ---------------------- | ----------------------------------------- |
-| `file(path)`           | Get reference by path (auto-detects type) |
-| `mdFile(path)`         | Get Markdown file reference               |
-| `indexFile(path)`      | Get index file reference                  |
-| `directory(path)`      | Get directory reference                   |
-| `fileTree(path?)`      | Build file tree from path                 |
-| `directoryTree(path?)` | Build directory-only tree                 |
-| `basePath()`           | Get base path                             |
-
-### DocFileMdReference
-
-| Method            | Description                      |
-| ----------------- | -------------------------------- |
-| `read()`          | Read file and return entity      |
-| `readText()`      | Read raw file content            |
-| `write(entity)`   | Write entity to file             |
-| `writeText(text)` | Write raw text to file           |
-| `writeDefault()`  | Create file with default content |
-| `delete()`        | Delete file                      |
-| `exists()`        | Check if file exists             |
-| `archive()`       | Move to archive directory        |
-| `restore()`       | Restore from archive             |
-| `size()`          | Get file size in bytes           |
-| `lastModified()`  | Get last modified time           |
-| `createdAt()`     | Get creation time                |
-| `directory()`     | Get parent directory reference   |
-| `relation(key)`   | Get single relation reference    |
-| `relations(key)`  | Get multi-relation references    |
-
-### DocDirectoryReference
-
-| Method                | Description                  |
-| --------------------- | ---------------------------- |
-| `fileNames()`         | List file names              |
-| `directoryNames()`    | List subdirectory names      |
-| `files()`             | Get all file references      |
-| `mdFiles()`           | Get Markdown file references |
-| `directories()`       | Get subdirectory references  |
-| `file(name)`          | Get file reference by name   |
-| `mdFile(name)`        | Get Markdown file reference  |
-| `directory(name)`     | Get subdirectory reference   |
-| `indexFile()`         | Get index file reference     |
-| `readFiles()`         | Read all files               |
-| `readMdFiles()`       | Read all Markdown files      |
-| `readIndexFile()`     | Read index file              |
-| `createMdFile(name?)` | Create new Markdown file     |
-| `exists()`            | Check if directory exists    |
-
-### DocFileMdEntity
-
-| Method                  | Description                      |
-| ----------------------- | -------------------------------- |
-| `content()`             | Get content value object         |
-| `path`                  | Get path information             |
-| `withContent(content)`  | Create copy with new content     |
-| `withTitle(title)`      | Create copy with new title       |
-| `withDescription(desc)` | Create copy with new description |
-| `withMeta(meta)`        | Create copy with new metadata    |
-| `toJson()`              | Convert to JSON                  |
 
 ## License
 
