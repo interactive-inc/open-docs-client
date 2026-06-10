@@ -29,11 +29,9 @@
     "claude:continue": "claude --continue --dangerously-skip-permissions --mcp-config .mcp.json",
     "check": "tsgo --noEmit",
     "build": "tsup",
-    "deploy": "bun publish",
-    "dev": "bun run index.dev"
+    "deploy": "bun publish"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.0",
     "@octokit/rest": "^22.0.0",
     "yaml": "^2.8.1",
     "zod": "^4.0.10"
@@ -42,7 +40,6 @@
     "@types/bun": "^1.2.19",
     "@types/node": "^24.1.0",
     "@typescript/native-preview": "^7.0.0-dev.20251121.1",
-    "concurrently": "^9.2.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
     "vite-plus": "^0.1.24"
