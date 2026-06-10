@@ -1,7 +1,7 @@
 /**
  * Read-only file system interface for document operations
  */
-export interface DocFileSystemReadInterface {
+export type DocFileSystemReadInterface = {
   /**
    * Read file content at the specified path
    */

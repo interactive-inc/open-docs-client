@@ -1,7 +1,7 @@
 /**
  * Write-only file system interface for document operations
  */
-export interface DocFileSystemWriteInterface {
+export type DocFileSystemWriteInterface = {
   /**
    * Write content to file at the specified path (creates directory if needed)
    */

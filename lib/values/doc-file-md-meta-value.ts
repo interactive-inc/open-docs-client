@@ -37,7 +37,7 @@ export class DocFileMdMetaValue<T extends DocCustomSchema> {
     readonly value: SchemaToValueType<T>,
     readonly customSchema: T,
   ) {
-    for (const key in customSchema) {
+    for (const key of Object.keys(customSchema) as Array<keyof T & string>) {
       const field = customSchema[key]
       if (field.required && !(key in value)) {
         throw new Error(`Required field "${key}" is missing`)

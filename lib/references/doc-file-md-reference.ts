@@ -326,10 +326,17 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     })
   }
 
-  async relation<U extends DocCustomSchema = DocCustomSchema>(
+  async relation(key: RelationKeys<T>): Promise<DocFileMdReference<DocCustomSchema> | null>
+
+  async relation<U extends DocCustomSchema>(
     key: RelationKeys<T>,
-    targetSchema?: U,
-  ): Promise<DocFileMdReference<U> | null> {
+    targetSchema: U,
+  ): Promise<DocFileMdReference<U> | null>
+
+  async relation(
+    key: RelationKeys<T>,
+    targetSchema?: DocCustomSchema,
+  ): Promise<DocFileMdReference<DocCustomSchema> | null> {
     const file = await this.read()
 
     const relationValue = file.content().meta().relation(key)
@@ -347,8 +354,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     const indexFile = await indexRef.read()
 
     const schemaValue = indexFile.content.meta().schema()
-    const keyStr = key as string
-    const fieldValue = schemaValue.value[keyStr]
+    const fieldValue = schemaValue.value[String(key)]
 
     if (!fieldValue || fieldValue.type !== "relation") {
       return null
@@ -364,12 +370,11 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const fullPath = this.pathSystem.join(resolvedPath, `${relationValue}.md`)
 
-    // U defaults to DocCustomSchema, so {} satisfies the constraint
-    return new DocFileMdReference<U>({
+    return new DocFileMdReference<DocCustomSchema>({
       path: fullPath,
       fileSystem: this.fileSystem,
       pathSystem: this.pathSystem,
-      customSchema: targetSchema || ({} as U),
+      customSchema: targetSchema ?? {},
       config: this.props.config,
     })
   }
@@ -406,10 +411,17 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     return null
   }
 
-  async relations<U extends DocCustomSchema = DocCustomSchema>(
+  async relations(key: MultiRelationKeys<T>): Promise<DocFileMdReference<DocCustomSchema>[]>
+
+  async relations<U extends DocCustomSchema>(
     key: MultiRelationKeys<T>,
-    customSchema?: U,
-  ): Promise<DocFileMdReference<U>[]> {
+    customSchema: U,
+  ): Promise<DocFileMdReference<U>[]>
+
+  async relations(
+    key: MultiRelationKeys<T>,
+    customSchema?: DocCustomSchema,
+  ): Promise<DocFileMdReference<DocCustomSchema>[]> {
     const file = await this.read()
 
     const meta = file.content().meta()
@@ -441,11 +453,11 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     return fileNames.map((fileName: string) => {
       const resolvedPath = indexSchemaField.path
       const fullPath = this.pathSystem.join(resolvedPath, `${fileName}.md`)
-      return new DocFileMdReference<U>({
+      return new DocFileMdReference<DocCustomSchema>({
         path: fullPath,
         fileSystem: this.fileSystem,
         pathSystem: this.pathSystem,
-        customSchema: customSchema || ({} as U),
+        customSchema: customSchema ?? {},
         config: this.props.config,
       })
     })

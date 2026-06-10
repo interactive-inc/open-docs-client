@@ -73,7 +73,13 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
         return new Error(`File not found: ${relativePath}`)
       }
 
-      delete this.data[normalizedPath]
+      const nextData: JsonDocumentData = {}
+      for (const key of Object.keys(this.data)) {
+        if (key !== normalizedPath) {
+          nextData[key] = this.data[key]
+        }
+      }
+      this.data = nextData
       this.notifyDataChange()
       return null
     } catch (error) {

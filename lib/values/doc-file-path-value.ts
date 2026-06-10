@@ -63,7 +63,7 @@ export class DocFilePathValue {
    * Whether the file is archived
    */
   get isArchived(): boolean {
-    return this.path.includes("/.archive/")
+    return this.path.includes("/_/") || this.path.startsWith("_/")
   }
 
   /**

@@ -24,6 +24,7 @@ export class DocFileSystem implements DocFileSystemInterface {
     this.pathSystem = props.pathSystem ?? new DocPathSystem()
     this.reader = props.reader
     this.writer = props.writer
+    Object.freeze(this)
   }
 
   /**

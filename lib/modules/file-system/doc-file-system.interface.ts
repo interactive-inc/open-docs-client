@@ -2,7 +2,7 @@
  * Interface for DocFileSystem class
  * Defines all public methods available in DocFileSystem
  */
-export interface DocFileSystemInterface {
+export type DocFileSystemInterface = {
   /**
    * Read file content at the specified path
    */

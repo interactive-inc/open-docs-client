@@ -21,6 +21,7 @@ export class DocFileSystemNodeWrite implements DocFileSystemWriteInterface {
     this.basePath = props.basePath
     this.pathSystem = props.pathSystem ?? new DocPathSystem()
     this.reader = props.reader
+    Object.freeze(this)
   }
 
   /**

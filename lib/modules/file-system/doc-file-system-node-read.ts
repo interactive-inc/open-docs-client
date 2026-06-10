@@ -17,6 +17,7 @@ export class DocFileSystemNodeRead implements DocFileSystemReadInterface {
   constructor(props: Props) {
     this.basePath = props.basePath
     this.pathSystem = props.pathSystem ?? new DocPathSystem()
+    Object.freeze(this)
   }
 
   /**

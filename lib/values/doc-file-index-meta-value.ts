@@ -229,7 +229,7 @@ export class DocFileIndexMetaValue<T extends DocCustomSchema> {
       const rawSchema = record.schema as Record<string, unknown>
       const normalizedSchema: Record<string, unknown> = {}
 
-      for (const key in rawSchema) {
+      for (const key of Object.keys(rawSchema)) {
         const field = rawSchema[key] as Record<string, unknown>
         // Preserve all properties from the field, ensuring required defaults
         normalizedSchema[key] = {

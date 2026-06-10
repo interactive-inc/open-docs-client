@@ -57,6 +57,8 @@ export class DocClient {
     })
 
     this.fileTreeSystem = props.fileTreeSystem ?? fileTreeSystem
+
+    Object.freeze(this)
   }
 
   get safe(): Safe<this> {
@@ -78,7 +80,10 @@ export class DocClient {
     const fileName = this.pathSystem.basename(relativePath)
     if (fileName === this.config.indexFileName) {
       const dirPath = this.pathSystem.dirname(relativePath)
-      return this.indexFile(dirPath === "." ? "" : dirPath, customSchema as T)
+      if (customSchema === undefined) {
+        return this.indexFile(dirPath === "." ? "" : dirPath)
+      }
+      return this.indexFile(dirPath === "." ? "" : dirPath, customSchema)
     }
 
     if (relativePath.endsWith(".md")) {

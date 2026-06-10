@@ -63,7 +63,7 @@ export class DocFileTreeSystem {
         continue
       }
 
-      const directoryNode = await this.createDirectoryNode(fileName, filePath)
+      const directoryNode = await this.createDirectoryNode(fileName, filePath, false)
       if (directoryNode instanceof Error) {
         return directoryNode
       }
@@ -80,30 +80,36 @@ export class DocFileTreeSystem {
     fileName: string,
     filePath: string,
   ): Promise<DocTreeFileNodeValue | Error> {
-    let title = fileName
-    let icon = ""
-
-    if (fileName.endsWith(".md")) {
-      const mdFile = this.createMdFileReference(filePath)
-      if (await mdFile.exists()) {
-        try {
-          const entity = await mdFile.read()
-          title = entity.value.content.title || fileName
-        } catch {
-          // keep default title
-        }
-      }
-      icon = "📄"
-    } else {
-      icon = "📄"
-    }
+    const title = await this.readFileTitle(fileName, filePath)
 
     return DocTreeFileNodeValue.from({
       name: fileName,
       path: filePath,
-      icon,
+      icon: "📄",
       title,
     })
+  }
+
+  /**
+   * Read title from a file
+   */
+  private async readFileTitle(fileName: string, filePath: string): Promise<string> {
+    if (!fileName.endsWith(".md")) {
+      return fileName
+    }
+
+    const mdFile = this.createMdFileReference(filePath)
+
+    if (!(await mdFile.exists())) {
+      return fileName
+    }
+
+    try {
+      const entity = await mdFile.read()
+      return entity.value.content.title || fileName
+    } catch {
+      return fileName
+    }
   }
 
   /**
@@ -112,27 +118,17 @@ export class DocFileTreeSystem {
   private async createDirectoryNode(
     fileName: string,
     filePath: string,
+    directoryOnly: boolean,
   ): Promise<DocTreeDirectoryNodeValue | Error> {
-    let title = fileName
-    let icon = this.config.defaultIndexIcon
+    const indexInfo = await this.readDirectoryIndexInfo(fileName, filePath)
 
-    const indexFile = this.createIndexFileReference(filePath)
-
-    if (await indexFile.exists()) {
-      try {
-        const entity = await indexFile.read()
-        title = entity.value.content.title || fileName
-        const content = entity.content
-        const frontMatter = content.meta()
-        if (frontMatter) {
-          icon = frontMatter.icon || this.config.defaultIndexIcon
-        }
-      } catch (error) {
-        return error instanceof Error ? error : new Error(String(error))
-      }
+    if (indexInfo instanceof Error) {
+      return indexInfo
     }
 
-    const children = await this.buildFileTree(filePath)
+    const children = directoryOnly
+      ? await this.buildDirectoryTree(filePath)
+      : await this.buildFileTree(filePath)
 
     if (children instanceof Error) {
       return children
@@ -141,10 +137,34 @@ export class DocFileTreeSystem {
     return DocTreeDirectoryNodeValue.from({
       name: fileName,
       path: filePath,
-      icon,
-      title,
+      icon: indexInfo.icon,
+      title: indexInfo.title,
       children,
     })
+  }
+
+  /**
+   * Read title and icon from directory index file
+   */
+  private async readDirectoryIndexInfo(
+    fileName: string,
+    filePath: string,
+  ): Promise<{ title: string; icon: string } | Error> {
+    const indexFile = this.createIndexFileReference(filePath)
+
+    if (!(await indexFile.exists())) {
+      return { title: fileName, icon: this.config.defaultIndexIcon }
+    }
+
+    try {
+      const entity = await indexFile.read()
+      const title = entity.value.content.title || fileName
+      const frontMatter = entity.content.meta()
+      const icon = frontMatter?.icon || this.config.defaultIndexIcon
+      return { title, icon }
+    } catch (error) {
+      return error instanceof Error ? error : new Error(String(error))
+    }
   }
 
   /**
@@ -205,7 +225,7 @@ export class DocFileTreeSystem {
         : fileName
       const isDirectory = await this.props.fileSystem.isDirectory(filePath)
       if (!isDirectory) continue
-      const directoryNode = await this.createDirectoryNodeForTree(fileName, filePath)
+      const directoryNode = await this.createDirectoryNode(fileName, filePath, true)
       if (directoryNode instanceof Error) {
         return directoryNode
       }
@@ -213,46 +233,5 @@ export class DocFileTreeSystem {
     }
 
     return results
-  }
-
-  /**
-   * Create directory node for directory tree
-   */
-  private async createDirectoryNodeForTree(
-    fileName: string,
-    filePath: string,
-  ): Promise<DocTreeDirectoryNodeValue | Error> {
-    let title = fileName
-    let icon = this.config.defaultIndexIcon
-
-    const indexFile = this.createIndexFileReference(filePath)
-
-    if (await indexFile.exists()) {
-      try {
-        const entity = await indexFile.read()
-        title = entity.value.content.title || fileName
-        const content = entity.content
-        const frontMatter = content.meta()
-        if (frontMatter && typeof frontMatter === "object" && "icon" in frontMatter) {
-          icon = frontMatter.icon || this.config.defaultIndexIcon
-        }
-      } catch (error) {
-        return error instanceof Error ? error : new Error(String(error))
-      }
-    }
-
-    const children = await this.buildDirectoryTree(filePath)
-
-    if (children instanceof Error) {
-      return children
-    }
-
-    return DocTreeDirectoryNodeValue.from({
-      name: fileName,
-      path: filePath,
-      icon,
-      title,
-      children,
-    })
   }
 }

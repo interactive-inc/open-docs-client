@@ -38,18 +38,29 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
   }
 
   /**
+   * Check if reader exposes a SHA cache (OctokitRead instance)
+   */
+  private hasShaCache(
+    reader: DocFileSystemReadInterface,
+  ): reader is DocFileSystemOctokitRead {
+    return "getCachedSha" in reader
+  }
+
+  private cachedSha(relativePath: string): string | undefined {
+    if (this.reader && this.hasShaCache(this.reader)) {
+      return this.reader.getCachedSha(relativePath)
+    }
+    return undefined
+  }
+
+  /**
    * Write content to file in GitHub repository
    */
   async writeFile(relativePath: string, content: string): Promise<Error | null> {
     try {
       const fullPath = this.pathSystem.join(this.basePath, relativePath)
       const encodedContent = Buffer.from(content).toString("base64")
-      let sha: string | undefined
-
-      // Try to get SHA from reader cache if it's an OctokitRead instance
-      if (this.reader && "getCachedSha" in this.reader) {
-        sha = (this.reader as DocFileSystemOctokitRead).getCachedSha(relativePath)
-      }
+      let sha = this.cachedSha(relativePath)
 
       // If not cached, try to get existing file SHA
       if (!sha) {
@@ -90,12 +101,7 @@ export class DocFileSystemOctokitWrite implements DocFileSystemWriteInterface {
   async deleteFile(relativePath: string): Promise<Error | null> {
     try {
       const fullPath = this.pathSystem.join(this.basePath, relativePath)
-      let sha: string | undefined
-
-      // Try to get SHA from reader cache if it's an OctokitRead instance
-      if (this.reader && "getCachedSha" in this.reader) {
-        sha = (this.reader as DocFileSystemOctokitRead).getCachedSha(relativePath)
-      }
+      let sha = this.cachedSha(relativePath)
 
       // If not cached, get from API
       if (!sha) {
