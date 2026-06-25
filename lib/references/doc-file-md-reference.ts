@@ -1,3 +1,4 @@
+import { META_FILE_NAME } from "../constants"
 import { createSafeProxy, type Safe } from "../create-safe-proxy"
 import { DocFileMdEntity } from "../entities/doc-file-md-entity"
 import type { DocFileSystemInterface } from "../modules/file-system/doc-file-system.interface"
@@ -106,8 +107,10 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
       if (archivedContent !== null) {
         const contentValue = DocFileMdContentValue.fromMarkdown(archivedContent, this.customSchema)
+        // アーカイブの実ファイル位置で pathValue を構築する。
+        // 非アーカイブパスのままだと entity の isArchived フラグと矛盾する
         const pathValue = DocFilePathValue.fromPathWithSystem(
-          actualPath,
+          this.archivedPath,
           this.pathSystem,
           this.basePath,
         )
@@ -361,12 +364,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     }
 
     const relationField = schemaValue.relation(key)
-    let resolvedPath = relationField.path
-
-    if (resolvedPath.startsWith("..")) {
-      resolvedPath = this.pathSystem.join(this.directoryPath, resolvedPath)
-      resolvedPath = this.pathSystem.normalize(resolvedPath)
-    }
+    const resolvedPath = this.resolveRelationDirectory(relationField.path)
 
     const fullPath = this.pathSystem.join(resolvedPath, `${relationValue}.md`)
 
@@ -379,8 +377,24 @@ export class DocFileMdReference<T extends DocCustomSchema> {
     })
   }
 
+  /**
+   * スキーマで定義された relation の path を解決する。
+   * ".." 始まりの相対パスはファイルのディレクトリ基準で正規化する
+   */
+  private resolveRelationDirectory(schemaPath: string): string {
+    if (schemaPath.startsWith("..")) {
+      return this.pathSystem.normalize(this.pathSystem.join(this.directoryPath, schemaPath))
+    }
+
+    return schemaPath
+  }
+
   async directoryIndex(): Promise<DocFileIndexReference<T> | null> {
-    const indexPath = this.pathSystem.join(this.directoryPath, "index.md")
+    const indexFileName = this.props.config.indexFileName
+    const archiveDirectoryName = this.props.config.archiveDirectoryName
+    const metaFileName = this.props.config.metaFileName ?? META_FILE_NAME
+
+    const indexPath = this.pathSystem.join(this.directoryPath, indexFileName)
 
     const exists = await this.fileSystem.exists(indexPath)
 
@@ -394,7 +408,26 @@ export class DocFileMdReference<T extends DocCustomSchema> {
       })
     }
 
-    const archivedIndexPath = this.pathSystem.join(this.directoryPath, "_", "index.md")
+    // index.md が無くても .meta.json があればスキーマを解決できるため index 参照を返す
+    const metaPath = this.pathSystem.join(this.directoryPath, metaFileName)
+
+    const metaExists = await this.fileSystem.exists(metaPath)
+
+    if (metaExists) {
+      return new DocFileIndexReference({
+        path: indexPath,
+        fileSystem: this.fileSystem,
+        pathSystem: this.pathSystem,
+        customSchema: this.customSchema,
+        config: this.props.config,
+      })
+    }
+
+    const archivedIndexPath = this.pathSystem.join(
+      this.directoryPath,
+      archiveDirectoryName,
+      indexFileName,
+    )
 
     const archivedExists = await this.fileSystem.exists(archivedIndexPath)
 
@@ -424,15 +457,7 @@ export class DocFileMdReference<T extends DocCustomSchema> {
   ): Promise<DocFileMdReference<DocCustomSchema>[]> {
     const file = await this.read()
 
-    const meta = file.content().meta()
-
-    const schemaField = meta.schemaField(key)
-
-    if (schemaField.type !== "multi-relation") {
-      return []
-    }
-
-    const fileNames = meta.multiRelation(key)
+    const fileNames = file.content().meta().multiRelation(key)
 
     if (fileNames === null) {
       return []
@@ -446,12 +471,19 @@ export class DocFileMdReference<T extends DocCustomSchema> {
 
     const indexFile = await indexRef.read()
 
+    // relation() と同様に index スキーマから型を判定する。
+    // md 自身のスキーマを見ると未定義キーで throw しうるため避ける
     const indexSchema = indexFile.content.meta().schema()
+    const fieldValue = indexSchema.value[String(key)]
+
+    if (!fieldValue || fieldValue.type !== "multi-relation") {
+      return []
+    }
 
     const indexSchemaField = indexSchema.multiRelation(key)
+    const resolvedPath = this.resolveRelationDirectory(indexSchemaField.path)
 
     return fileNames.map((fileName: string) => {
-      const resolvedPath = indexSchemaField.path
       const fullPath = this.pathSystem.join(resolvedPath, `${fileName}.md`)
       return new DocFileMdReference<DocCustomSchema>({
         path: fullPath,

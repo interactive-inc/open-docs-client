@@ -9,12 +9,12 @@ test("DocDirectoryReference - directoryNames メソッドでサブディレク�
     getBasePath: () => "/test",
     readDirectoryFileNames: async (path: string) => {
       if (path === "docs") {
-        return ["file1.md", "subdir1", "subdir2", "_archive", "file2.txt"]
+        return ["file1.md", "subdir1", "subdir2", "_", "_drafts", "file2.txt"]
       }
       return []
     },
     isDirectory: async (path: string) => {
-      return ["docs/subdir1", "docs/subdir2", "docs/_archive"].includes(path)
+      return ["docs/subdir1", "docs/subdir2", "docs/_", "docs/_drafts"].includes(path)
     },
   } as unknown as DocFileSystemInterface
 
@@ -34,10 +34,12 @@ test("DocDirectoryReference - directoryNames メソッドでサブディレク�
     throw dirNames
   }
 
-  expect(dirNames.length).toBe(2) // _archiveは除外
+  // アーカイブ名 "_" は完全一致で除外。"_drafts" は別ディレクトリなので除外しない
+  expect(dirNames.length).toBe(3)
   expect(dirNames).toContain("subdir1")
   expect(dirNames).toContain("subdir2")
-  expect(dirNames).not.toContain("_archive")
+  expect(dirNames).toContain("_drafts")
+  expect(dirNames).not.toContain("_")
   expect(dirNames).not.toContain("file1.md")
   expect(dirNames).not.toContain("file2.txt")
 })
@@ -47,12 +49,12 @@ test("DocDirectoryReference - directories メソッドでサブディレクト�
     getBasePath: () => "/test",
     readDirectoryFileNames: async (path: string) => {
       if (path === "docs") {
-        return ["subdir1", "subdir2", "_archive"]
+        return ["subdir1", "subdir2", "_"]
       }
       return []
     },
     isDirectory: async (path: string) => {
-      return ["docs/subdir1", "docs/subdir2", "docs/_archive"].includes(path)
+      return ["docs/subdir1", "docs/subdir2", "docs/_"].includes(path)
     },
   } as unknown as DocFileSystemInterface
 
@@ -72,7 +74,7 @@ test("DocDirectoryReference - directories メソッドでサブディレクト�
     throw directories
   }
 
-  expect(directories.length).toBe(2) // _archiveは除外
+  expect(directories.length).toBe(2) // アーカイブ "_" は除外
   expect(directories[0]).toBeInstanceOf(DocDirectoryReference)
   expect(directories[0].relativePath).toBe("docs/subdir1")
   expect(directories[1].relativePath).toBe("docs/subdir2")

@@ -115,7 +115,7 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     const allFileNames = await this.fileNames()
 
     for (const fileName of allFileNames) {
-      if (fileName === "index.md") continue
+      if (fileName === this.indexFileName) continue
       if (fileName.endsWith(".md")) {
         yield new DocFileMdReference({
           path: this.pathSystem.join(this.relativePath, fileName),
@@ -280,7 +280,7 @@ export class DocDirectoryReference<T extends DocCustomSchema> {
     const names: string[] = []
 
     for (const fileName of allFileNames) {
-      if (fileName.startsWith(this.archiveDirectoryName)) continue
+      if (fileName === this.archiveDirectoryName) continue
       if (this.props.config.directoryExcludes.includes(fileName)) continue
 
       const filePath = this.pathSystem.join(this.relativePath, fileName)
