@@ -14,6 +14,7 @@ export class DocFilePathValue {
   ) {
     zDocFilePath.parse(value)
     this.pathSystem = pathSystem
+    Object.freeze(this.value)
     Object.freeze(this)
   }
 
@@ -70,7 +71,7 @@ export class DocFilePathValue {
    * Export as JSON format
    */
   toJson(): DocFilePath {
-    return this.value
+    return { ...this.value }
   }
 
   /**

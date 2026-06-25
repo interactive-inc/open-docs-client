@@ -112,7 +112,8 @@ export const zDocSchemaFieldRelation = z.object({
   required: z.boolean(),
   title: z.string().nullable(),
   description: z.string().nullable(),
-  path: z.string().min(1),
+  // 空文字は path 未設定のプレースホルダとして許容する（empty() が生成する）
+  path: z.string(),
   default: z.string().nullable(),
 })
 
@@ -124,7 +125,8 @@ export const zDocSchemaFieldMultiRelation = z.object({
   required: z.boolean(),
   title: z.string().nullable(),
   description: z.string().nullable(),
-  path: z.string().min(1),
+  // 空文字は path 未設定のプレースホルダとして許容する（empty() が生成する）
+  path: z.string(),
   default: z.array(z.string()).nullable(),
 })
 

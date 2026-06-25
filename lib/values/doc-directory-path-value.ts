@@ -15,6 +15,7 @@ export class DocDirectoryPathValue {
     private readonly value: Value,
     private readonly pathSystem: DocPathSystem,
   ) {
+    Object.freeze(this.value)
     Object.freeze(this)
   }
 
@@ -172,7 +173,7 @@ export class DocDirectoryPathValue {
    * Export as JSON format
    */
   toJson(): Value {
-    return this.value
+    return { ...this.value }
   }
 
   /**
@@ -187,6 +188,7 @@ export class DocDirectoryPathValue {
    */
   contains(other: DocDirectoryPathValue): boolean {
     const relative = this.pathSystem.relative(this.path, other.path)
-    return !relative.startsWith("..") && relative !== ""
+    // "." と "" は自身を指すため子孫とみなさない
+    return !relative.startsWith("..") && relative !== "" && relative !== "."
   }
 }

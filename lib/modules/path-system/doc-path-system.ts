@@ -4,6 +4,14 @@
 export class DocPathSystem {
   readonly separator = "/"
 
+  constructor() {
+    // サブクラス（DocPathSystemMock 等）は super() 後にプロパティを代入するため、
+    // 自身が末端クラスのときだけ凍結する
+    if (new.target === DocPathSystem) {
+      Object.freeze(this)
+    }
+  }
+
   /**
    * Join paths
    */
@@ -75,8 +83,10 @@ export class DocPathSystem {
    * Calculate relative path
    */
   relative(from: string, to: string): string {
-    const fromSegments = from.split(this.separator).filter(Boolean)
-    const toSegments = to.split(this.separator).filter(Boolean)
+    // "." セグメントはカレントディレクトリを表すため除外する。
+    // 残すと relative(".", "docs") が "../docs" になり contains() が誤判定する
+    const fromSegments = from.split(this.separator).filter((s) => s !== "" && s !== ".")
+    const toSegments = to.split(this.separator).filter((s) => s !== "" && s !== ".")
 
     let commonLength = 0
     for (let i = 0; i < Math.min(fromSegments.length, toSegments.length); i++) {

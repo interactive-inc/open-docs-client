@@ -83,3 +83,20 @@ test("DocPathSystem - sep: セパレータ", () => {
 
   expect(system.separator).toBe("/")
 })
+
+// "." セグメントを除外する（contains() の誤判定を防ぐ回帰テスト）
+test("DocPathSystem - relative: ルート(.)からの相対パスを正しく計算", () => {
+  const system = new DocPathSystem()
+
+  expect(system.relative(".", "docs")).toBe("docs")
+  expect(system.relative(".", "docs/products")).toBe("docs/products")
+  expect(system.relative(".", ".")).toBe(".")
+  expect(system.relative("docs", ".")).toBe("..")
+})
+
+// インスタンスが凍結されている
+test("DocPathSystem - インスタンスは凍結されている", () => {
+  const system = new DocPathSystem()
+
+  expect(Object.isFrozen(system)).toBe(true)
+})

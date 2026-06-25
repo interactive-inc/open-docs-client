@@ -97,3 +97,46 @@ test("DocDirectoryPathValue - 不変性の確認", () => {
     value.value = {}
   }).toThrow()
 })
+
+// contains() の境界（自己包含しない / ルートが子を含む）回帰テスト
+test("DocDirectoryPathValue - contains: ルートは子を含む", () => {
+  const pathSystem = new DocPathSystem()
+  const root = DocDirectoryPathValue.fromPathWithSystem(".", "/base", pathSystem)
+  const child = DocDirectoryPathValue.fromPathWithSystem("docs", "/base", pathSystem)
+
+  expect(root.contains(child)).toBe(true)
+})
+
+test("DocDirectoryPathValue - contains: 自身は含まない", () => {
+  const pathSystem = new DocPathSystem()
+  const dir = DocDirectoryPathValue.fromPathWithSystem("docs", "/base", pathSystem)
+
+  expect(dir.contains(dir)).toBe(false)
+})
+
+test("DocDirectoryPathValue - contains: 兄弟は含まない", () => {
+  const pathSystem = new DocPathSystem()
+  const dir = DocDirectoryPathValue.fromPathWithSystem("docs/a", "/base", pathSystem)
+  const sibling = DocDirectoryPathValue.fromPathWithSystem("docs/b", "/base", pathSystem)
+
+  expect(dir.contains(sibling)).toBe(false)
+})
+
+test("DocDirectoryPathValue - contains: 子孫を含む", () => {
+  const pathSystem = new DocPathSystem()
+  const dir = DocDirectoryPathValue.fromPathWithSystem("docs", "/base", pathSystem)
+  const descendant = DocDirectoryPathValue.fromPathWithSystem("docs/a/b", "/base", pathSystem)
+
+  expect(dir.contains(descendant)).toBe(true)
+})
+
+// toJson() が内部 value を参照で漏らさない（不変性の回帰テスト）
+test("DocDirectoryPathValue - toJson: 出力を変更しても内部状態は不変", () => {
+  const pathSystem = new DocPathSystem()
+  const dir = DocDirectoryPathValue.fromPathWithSystem("docs", "/base", pathSystem)
+
+  const json = dir.toJson()
+  json.name = "changed"
+
+  expect(dir.name).toBe("docs")
+})

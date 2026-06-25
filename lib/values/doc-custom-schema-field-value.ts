@@ -13,17 +13,6 @@ import {
   zDocMetaFieldText,
 } from "@/models"
 import type { DocCustomSchemaField } from "@/types"
-import { DocMetaFieldBooleanValue } from "@/values/doc-meta-field/doc-meta-field-boolean-value"
-import { DocMetaFieldMultiNumberValue } from "@/values/doc-meta-field/doc-meta-field-multi-number-value"
-import { DocMetaFieldMultiRelationValue } from "@/values/doc-meta-field/doc-meta-field-multi-relation-value"
-import { DocMetaFieldMultiSelectNumberValue } from "@/values/doc-meta-field/doc-meta-field-multi-select-number-value"
-import { DocMetaFieldMultiSelectTextValue } from "@/values/doc-meta-field/doc-meta-field-multi-select-text-value"
-import { DocMetaFieldMultiTextValue } from "@/values/doc-meta-field/doc-meta-field-multi-text-value"
-import { DocMetaFieldNumberValue } from "@/values/doc-meta-field/doc-meta-field-number-value"
-import { DocMetaFieldRelationValue } from "@/values/doc-meta-field/doc-meta-field-relation-value"
-import { DocMetaFieldSelectNumberValue } from "@/values/doc-meta-field/doc-meta-field-select-number-value"
-import { DocMetaFieldSelectTextValue } from "@/values/doc-meta-field/doc-meta-field-select-text-value"
-import { DocMetaFieldTextValue } from "@/values/doc-meta-field/doc-meta-field-text-value"
 
 export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
   constructor(readonly value: T) {
@@ -37,7 +26,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldText.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldTextValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -48,7 +37,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldNumber.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldNumberValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -59,7 +48,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldBoolean.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldBooleanValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -70,7 +59,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldSelectText.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldSelectTextValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -81,7 +70,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldSelectNumber.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldSelectNumberValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -92,7 +81,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldRelation.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldRelationValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -103,7 +92,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldMultiText.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldMultiTextValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -114,7 +103,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldMultiNumber.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldMultiNumberValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -125,7 +114,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldMultiSelectText.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldMultiSelectTextValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -136,7 +125,7 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldMultiSelectNumber.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldMultiSelectNumberValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
@@ -147,12 +136,16 @@ export class DocCustomSchemaFieldValue<T extends DocCustomSchemaField> {
         return zDocMetaFieldMultiRelation.parse(value)
       } catch {
         if (this.value.required) {
-          return DocMetaFieldMultiRelationValue.defaultValue()
+          throw new Error(`required field "${this.fieldType()}" is missing or invalid`)
         }
         return null
       }
     }
 
     throw new Error("Unknown field type")
+  }
+
+  private fieldType(): string {
+    return this.value.type
   }
 }
