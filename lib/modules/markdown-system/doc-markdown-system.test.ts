@@ -143,3 +143,47 @@ test("複数の空行を正しく処理する", () => {
   const system = new DocMarkdownSystem()
   expect(system.extractDescription(markdown)).toBe("説明文です。")
 })
+
+// FrontMatter の値に含まれる "---" がデータ損失しない（回帰テスト）
+test("FrontMatter の値に含まれる --- を保持する", () => {
+  const system = new DocMarkdownSystem()
+  const markdown = `---
+note: "see --- here"
+title: Hello
+---
+
+body`
+
+  expect(system.extractFrontMatter(markdown)).toBe('note: "see --- here"\ntitle: Hello')
+})
+
+// 可変長区切り（-----）でも正しく抽出する
+test("可変長の区切り線を扱える", () => {
+  const system = new DocMarkdownSystem()
+  const markdown = `-----
+title: B
+-----
+
+body`
+
+  expect(system.extractFrontMatter(markdown)).toBe("title: B")
+  expect(system.extractBody(markdown)).toBe("body")
+})
+
+// 空の FrontMatter
+test("空の FrontMatter は空文字を返す", () => {
+  const system = new DocMarkdownSystem()
+  const markdown = `---
+---
+
+body`
+
+  expect(system.extractFrontMatter(markdown)).toBe("")
+})
+
+// FrontMatter が無い場合は null
+test("FrontMatter が無ければ null を返す", () => {
+  const system = new DocMarkdownSystem()
+
+  expect(system.extractFrontMatter("# Just body")).toBe(null)
+})

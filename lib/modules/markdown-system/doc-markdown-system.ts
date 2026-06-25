@@ -37,10 +37,9 @@ export class DocMarkdownSystem {
       return null
     }
 
-    return text
-      .slice(0, endIndex + separator.length + 1)
-      .replaceAll(separator, "")
-      .trim()
+    // 開始区切り行の改行後から終了区切り行の直前までを切り出す。
+    // replaceAll は YAML 値の中の "---" まで除去してしまうため使わない
+    return text.slice(separator.length + 1, endIndex).trim()
   }
 
   /**

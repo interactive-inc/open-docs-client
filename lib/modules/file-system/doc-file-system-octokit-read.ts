@@ -260,10 +260,12 @@ export class DocFileSystemOctokitRead implements DocFileSystemReadInterface {
    */
   async getFileUpdatedTime(relativePath: string): Promise<Date | Error> {
     try {
+      const fullPath = this.pathSystem.join(this.basePath, relativePath)
+
       const commits = await this.octokit.repos.listCommits({
         owner: this.owner,
         repo: this.repo,
-        path: relativePath,
+        path: fullPath,
         sha: this.branch,
         per_page: 1,
       })
@@ -285,16 +287,29 @@ export class DocFileSystemOctokitRead implements DocFileSystemReadInterface {
    */
   async getFileCreatedTime(relativePath: string): Promise<Date | Error> {
     try {
-      const commits = await this.octokit.repos.listCommits({
+      const fullPath = this.pathSystem.join(this.basePath, relativePath)
+
+      // listCommits は新しい順に返すため、最古（作成）コミットを得るには
+      // 最終ページまで辿る必要がある。iterator で全ページを走査する
+      const iterator = this.octokit.paginate.iterator(this.octokit.repos.listCommits, {
         owner: this.owner,
         repo: this.repo,
-        path: relativePath,
+        path: fullPath,
         sha: this.branch,
+        per_page: 100,
       })
 
-      const lastCommit = commits.data[commits.data.length - 1]
-      if (lastCommit?.commit.author?.date) {
-        return new Date(lastCommit.commit.author.date)
+      let oldestDate: string | undefined
+
+      for await (const response of iterator) {
+        const lastInPage = response.data[response.data.length - 1]
+        if (lastInPage?.commit.author?.date) {
+          oldestDate = lastInPage.commit.author.date
+        }
+      }
+
+      if (oldestDate) {
+        return new Date(oldestDate)
       }
 
       return new Error(`No commits found for ${relativePath}`)
