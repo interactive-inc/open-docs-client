@@ -1,22 +1,15 @@
 import { z } from "zod"
 import type { DocFileSystemReadInterface } from "@/modules/file-system/doc-file-system-read.interface"
 import type { DocFileSystemWriteInterface } from "@/modules/file-system/doc-file-system-write.interface"
+import type { DocFileSystemJsonStore } from "./doc-file-system-json-store"
 import { DocPathSystem } from "../path-system/doc-path-system"
 
 const zJsonDocumentData = z.record(z.string(), z.string())
 
 type JsonDocumentData = z.infer<typeof zJsonDocumentData>
 
-function parseJsonDocumentData(data: unknown): JsonDocumentData | Error {
-  try {
-    return zJsonDocumentData.parse(data)
-  } catch (error) {
-    return error instanceof Error ? error : new Error("Failed to parse JSON document data")
-  }
-}
-
 type Props = {
-  data?: JsonDocumentData | unknown
+  store: DocFileSystemJsonStore
   pathSystem?: DocPathSystem
   reader?: DocFileSystemReadInterface
   onDataChange?: (data: JsonDocumentData) => void
@@ -26,23 +19,13 @@ type Props = {
  * JSON-based write-only file system implementation
  */
 export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
-  private data: JsonDocumentData
+  private readonly store: DocFileSystemJsonStore
   private readonly pathSystem: DocPathSystem
   private readonly reader?: DocFileSystemReadInterface
   private readonly onDataChange?: (data: JsonDocumentData) => void
 
-  constructor(props: Props = {}) {
-    // Parse and validate initial JSON data
-    if (props.data !== undefined) {
-      const parsed = parseJsonDocumentData(props.data)
-      if (parsed instanceof Error) {
-        throw parsed
-      }
-      this.data = parsed
-    } else {
-      this.data = {}
-    }
-
+  constructor(props: Props) {
+    this.store = props.store
     this.pathSystem = props.pathSystem ?? new DocPathSystem()
     this.reader = props.reader
     this.onDataChange = props.onDataChange
@@ -54,7 +37,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
   async writeFile(relativePath: string, content: string): Promise<Error | null> {
     try {
       const normalizedPath = this.normalizePath(relativePath)
-      this.data[normalizedPath] = content
+      this.store.set(normalizedPath, content)
       this.notifyDataChange()
       return null
     } catch (error) {
@@ -69,17 +52,12 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
     try {
       const normalizedPath = this.normalizePath(relativePath)
 
-      if (!(normalizedPath in this.data)) {
+      const deleted = this.store.delete(normalizedPath)
+
+      if (!deleted) {
         return new Error(`File not found: ${relativePath}`)
       }
 
-      const nextData: JsonDocumentData = {}
-      for (const key of Object.keys(this.data)) {
-        if (key !== normalizedPath) {
-          nextData[key] = this.data[key]
-        }
-      }
-      this.data = nextData
       this.notifyDataChange()
       return null
     } catch (error) {
@@ -98,7 +76,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
       const gitkeepPath = this.pathSystem.join(normalizedPath, ".gitkeep")
       const normalizedGitkeepPath = this.normalizePath(gitkeepPath)
 
-      this.data[normalizedGitkeepPath] = ""
+      this.store.set(normalizedGitkeepPath, "")
       this.notifyDataChange()
       return null
     } catch (error) {
@@ -150,14 +128,16 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
           return new Error(`Source file not found: ${sourcePath}`)
         }
 
-        this.data[normalizedDestPath] = content
+        this.store.set(normalizedDestPath, content)
       } else {
-        // Fallback to internal data
-        if (!(normalizedSourcePath in this.data)) {
+        // Fallback to internal store
+        const sourceContent = this.store.get(normalizedSourcePath)
+
+        if (sourceContent === undefined) {
           return new Error(`Source file not found: ${sourcePath}`)
         }
 
-        this.data[normalizedDestPath] = this.data[normalizedSourcePath]
+        this.store.set(normalizedDestPath, sourceContent)
       }
 
       this.notifyDataChange()
@@ -191,7 +171,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
    * Get the current JSON data
    */
   getData(): JsonDocumentData {
-    return { ...this.data }
+    return this.store.toData()
   }
 
   /**
@@ -199,12 +179,11 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
    */
   setData(data: JsonDocumentData | unknown): Error | null {
     try {
-      const parsed = parseJsonDocumentData(data)
-      if (parsed instanceof Error) {
-        return parsed
+      const result = this.store.replace(data)
+      if (result instanceof Error) {
+        return result
       }
 
-      this.data = parsed
       this.notifyDataChange()
       return null
     } catch (error) {
@@ -216,7 +195,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
    * Clear all data
    */
   clear(): void {
-    this.data = {}
+    this.store.clear()
     this.notifyDataChange()
   }
 
@@ -224,7 +203,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
    * Get all file paths in the JSON data
    */
   getAllFilePaths(): string[] {
-    return Object.keys(this.data)
+    return this.store.keys()
   }
 
   /**
@@ -241,7 +220,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
     const normalizedPath = this.normalizePath(relativePath)
 
     // Check if any file starts with this path + "/"
-    for (const filePath of Object.keys(this.data)) {
+    for (const filePath of this.store.keys()) {
       if (filePath.startsWith(`${normalizedPath}/`)) {
         return true
       }
@@ -255,7 +234,7 @@ export class DocFileSystemJsonWrite implements DocFileSystemWriteInterface {
    */
   private notifyDataChange(): void {
     if (this.onDataChange) {
-      this.onDataChange({ ...this.data })
+      this.onDataChange(this.store.toData())
     }
   }
 }

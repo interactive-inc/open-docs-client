@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { DocFileSystemJsonRead } from "./doc-file-system-json-read"
+import { DocFileSystemJsonStore } from "./doc-file-system-json-store"
 
 describe("DocFileSystemJsonRead", () => {
   // サンプルJSONデータ
@@ -15,7 +16,7 @@ describe("DocFileSystemJsonRead", () => {
 
   test("should create instance with valid JSON data", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
     })
 
     expect(fileSystem).toBeDefined()
@@ -24,7 +25,7 @@ describe("DocFileSystemJsonRead", () => {
 
   test("should create instance with custom base path", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
       basePath: "/custom/path",
     })
 
@@ -33,21 +34,17 @@ describe("DocFileSystemJsonRead", () => {
 
   test("should throw error with invalid JSON data", () => {
     expect(() => {
-      new DocFileSystemJsonRead({
-        data: "invalid data",
-      })
+      new DocFileSystemJsonStore({ data: "invalid data" })
     }).toThrow()
 
     expect(() => {
-      new DocFileSystemJsonRead({
-        data: { key: 123 }, // Invalid: value should be string
-      })
+      new DocFileSystemJsonStore({ data: { key: 123 } }) // Invalid: value should be string
     }).toThrow()
   })
 
   describe("readFile", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
     })
 
     test("should read existing file content", async () => {
@@ -78,7 +75,7 @@ describe("DocFileSystemJsonRead", () => {
 
   describe("file path operations", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
     })
 
     test("should get file name from path", () => {
@@ -101,7 +98,7 @@ describe("DocFileSystemJsonRead", () => {
 
   describe("directory operations", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
     })
 
     test("should read root directory file names", async () => {
@@ -132,7 +129,7 @@ describe("DocFileSystemJsonRead", () => {
 
   describe("file/directory checks", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
     })
 
     test("should check if path is a file", async () => {
@@ -173,7 +170,7 @@ describe("DocFileSystemJsonRead", () => {
   describe("resolve path", () => {
     test("should resolve relative path to absolute", () => {
       const fileSystem = new DocFileSystemJsonRead({
-        data: sampleJsonData,
+        store: new DocFileSystemJsonStore({ data: sampleJsonData }),
         basePath: "/project",
       })
 
@@ -183,7 +180,7 @@ describe("DocFileSystemJsonRead", () => {
 
     test("should resolve with default base path", () => {
       const fileSystem = new DocFileSystemJsonRead({
-        data: sampleJsonData,
+        store: new DocFileSystemJsonStore({ data: sampleJsonData }),
       })
 
       expect(fileSystem.resolve("README.md")).toBe("docs/README.md")
@@ -193,7 +190,7 @@ describe("DocFileSystemJsonRead", () => {
 
   describe("file size", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
     })
 
     test("should get file size in bytes", async () => {
@@ -214,7 +211,7 @@ describe("DocFileSystemJsonRead", () => {
 
   describe("file timestamps", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
     })
 
     test("should return error for modified time (not available)", async () => {
@@ -236,7 +233,7 @@ describe("DocFileSystemJsonRead", () => {
 
   describe("utility methods", () => {
     const fileSystem = new DocFileSystemJsonRead({
-      data: sampleJsonData,
+      store: new DocFileSystemJsonStore({ data: sampleJsonData }),
     })
 
     test("should get all file paths", () => {
@@ -261,7 +258,7 @@ describe("DocFileSystemJsonRead", () => {
   describe("edge cases", () => {
     test("should handle empty JSON data", async () => {
       const fileSystem = new DocFileSystemJsonRead({
-        data: {},
+        store: new DocFileSystemJsonStore({ data: {} }),
       })
 
       expect(await fileSystem.readFile("any.md")).toBeNull()
@@ -277,7 +274,7 @@ describe("DocFileSystemJsonRead", () => {
       }
 
       const fileSystem = new DocFileSystemJsonRead({
-        data: complexData,
+        store: new DocFileSystemJsonStore({ data: complexData }),
       })
 
       expect(await fileSystem.readFile("a/b/c/d/e/file.md")).toBe("Deep nested file")

@@ -2,6 +2,7 @@ import { z } from "zod"
 import type { DocPathSystem } from "../path-system/doc-path-system"
 import { DocFileSystem } from "./doc-file-system"
 import { DocFileSystemJsonRead } from "./doc-file-system-json-read"
+import { DocFileSystemJsonStore } from "./doc-file-system-json-store"
 import { DocFileSystemJsonWrite } from "./doc-file-system-json-write"
 
 const zJsonDocumentData = z.record(z.string(), z.string())
@@ -22,16 +23,19 @@ export class DocFileSystemJson extends DocFileSystem {
   private readonly jsonWriter: DocFileSystemJsonWrite
 
   constructor(props: JsonProps = {}) {
+    // Shared mutable store: reader と writer が同一データを参照する
+    const store = new DocFileSystemJsonStore({ data: props.data })
+
     // Create JSON read implementation
     const reader = new DocFileSystemJsonRead({
-      data: props.data,
+      store,
       basePath: props.basePath,
       pathSystem: props.pathSystem,
     })
 
     // Create JSON write implementation with reader
     const writer = new DocFileSystemJsonWrite({
-      data: props.data,
+      store,
       pathSystem: props.pathSystem,
       reader,
       onDataChange: props.onDataChange,

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { DocFileSystemJsonStore } from "./doc-file-system-json-store"
 import { DocFileSystemJsonWrite } from "./doc-file-system-json-write"
 
 describe("DocFileSystemJsonWrite", () => {
@@ -7,31 +8,33 @@ describe("DocFileSystemJsonWrite", () => {
     "docs/getting-started.md": "# Getting Started",
   }
 
-  test("should create instance with valid JSON data", () => {
-    const fileSystem = new DocFileSystemJsonWrite({
-      data: sampleJsonData,
+  function createWrite(data?: Record<string, string>) {
+    return new DocFileSystemJsonWrite({
+      store: new DocFileSystemJsonStore({ data }),
     })
+  }
+
+  test("should create instance with valid JSON data", () => {
+    const fileSystem = createWrite(sampleJsonData)
 
     expect(fileSystem.getAllFilePaths()).toEqual(["README.md", "docs/getting-started.md"])
   })
 
   test("should create instance with empty data", () => {
-    const fileSystem = new DocFileSystemJsonWrite()
+    const fileSystem = createWrite()
 
     expect(fileSystem.getAllFilePaths()).toEqual([])
   })
 
   test("should throw error with invalid JSON data", () => {
     expect(() => {
-      new DocFileSystemJsonWrite({
-        data: { key: 123 },
-      })
+      new DocFileSystemJsonStore({ data: { key: 123 } })
     }).toThrow()
   })
 
   describe("writeFile", () => {
     test("should write new file", async () => {
-      const fileSystem = new DocFileSystemJsonWrite()
+      const fileSystem = createWrite()
 
       const result = await fileSystem.writeFile("new-file.md", "# New File")
 
@@ -40,7 +43,7 @@ describe("DocFileSystemJsonWrite", () => {
     })
 
     test("should overwrite existing file", async () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       const result = await fileSystem.writeFile("README.md", "# Updated")
 
@@ -49,7 +52,7 @@ describe("DocFileSystemJsonWrite", () => {
     })
 
     test("should normalize leading slashes", async () => {
-      const fileSystem = new DocFileSystemJsonWrite()
+      const fileSystem = createWrite()
 
       await fileSystem.writeFile("/path/file.md", "content")
 
@@ -59,6 +62,7 @@ describe("DocFileSystemJsonWrite", () => {
     test("should notify data change callback", async () => {
       const snapshots: Record<string, string>[] = []
       const fileSystem = new DocFileSystemJsonWrite({
+        store: new DocFileSystemJsonStore(),
         onDataChange: (data) => {
           snapshots.push(data)
         },
@@ -73,7 +77,7 @@ describe("DocFileSystemJsonWrite", () => {
 
   describe("deleteFile", () => {
     test("should delete existing file", async () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       const result = await fileSystem.deleteFile("README.md")
 
@@ -82,7 +86,7 @@ describe("DocFileSystemJsonWrite", () => {
     })
 
     test("should return error for missing file", async () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       const result = await fileSystem.deleteFile("missing.md")
 
@@ -90,7 +94,7 @@ describe("DocFileSystemJsonWrite", () => {
     })
 
     test("should keep other files intact after delete", async () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       await fileSystem.deleteFile("README.md")
 
@@ -100,7 +104,7 @@ describe("DocFileSystemJsonWrite", () => {
 
   describe("copyFile", () => {
     test("should copy file within data", async () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       const result = await fileSystem.copyFile("README.md", "README-copy.md")
 
@@ -110,7 +114,7 @@ describe("DocFileSystemJsonWrite", () => {
     })
 
     test("should return error for missing source", async () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       const result = await fileSystem.copyFile("missing.md", "dest.md")
 
@@ -120,7 +124,7 @@ describe("DocFileSystemJsonWrite", () => {
 
   describe("moveFile", () => {
     test("should move file within data", async () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       const result = await fileSystem.moveFile("README.md", "docs/README.md")
 
@@ -130,7 +134,7 @@ describe("DocFileSystemJsonWrite", () => {
     })
 
     test("should return error for missing source", async () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       const result = await fileSystem.moveFile("missing.md", "dest.md")
 
@@ -140,7 +144,7 @@ describe("DocFileSystemJsonWrite", () => {
 
   describe("setData", () => {
     test("should replace entire data", () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       const result = fileSystem.setData({ "only.md": "content" })
 
@@ -149,7 +153,7 @@ describe("DocFileSystemJsonWrite", () => {
     })
 
     test("should return error for invalid data", () => {
-      const fileSystem = new DocFileSystemJsonWrite()
+      const fileSystem = createWrite()
 
       const result = fileSystem.setData({ key: 123 })
 
@@ -159,7 +163,7 @@ describe("DocFileSystemJsonWrite", () => {
 
   describe("clear", () => {
     test("should remove all data", () => {
-      const fileSystem = new DocFileSystemJsonWrite({ data: sampleJsonData })
+      const fileSystem = createWrite(sampleJsonData)
 
       fileSystem.clear()
 

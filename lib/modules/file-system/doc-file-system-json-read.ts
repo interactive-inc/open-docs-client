@@ -1,21 +1,9 @@
-import { z } from "zod"
 import type { DocFileSystemReadInterface } from "@/modules/file-system/doc-file-system-read.interface"
+import type { DocFileSystemJsonStore } from "./doc-file-system-json-store"
 import { DocPathSystem } from "../path-system/doc-path-system"
 
-const zJsonDocumentData = z.record(z.string(), z.string())
-
-type JsonDocumentData = z.infer<typeof zJsonDocumentData>
-
-function parseJsonDocumentData(data: unknown): JsonDocumentData | Error {
-  try {
-    return zJsonDocumentData.parse(data)
-  } catch (error) {
-    return error instanceof Error ? error : new Error("Failed to parse JSON document data")
-  }
-}
-
 type Props = {
-  data: JsonDocumentData | unknown
+  store: DocFileSystemJsonStore
   basePath?: string
   pathSystem?: DocPathSystem
 }
@@ -24,18 +12,12 @@ type Props = {
  * JSON-based read-only file system implementation
  */
 export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
-  private readonly data: JsonDocumentData
+  private readonly store: DocFileSystemJsonStore
   private readonly basePath: string
   private readonly pathSystem: DocPathSystem
 
   constructor(props: Props) {
-    // Parse and validate JSON data
-    const parsed = parseJsonDocumentData(props.data)
-    if (parsed instanceof Error) {
-      throw parsed
-    }
-
-    this.data = parsed
+    this.store = props.store
     this.basePath = props.basePath ?? "docs"
     this.pathSystem = props.pathSystem ?? new DocPathSystem()
     Object.freeze(this)
@@ -47,7 +29,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
   async readFile(relativePath: string): Promise<string | null | Error> {
     try {
       const normalizedPath = this.normalizePath(relativePath)
-      const content = this.data[normalizedPath]
+      const content = this.store.get(normalizedPath)
       return content ?? null
     } catch (error) {
       return error instanceof Error ? error : new Error(`Failed to read file at ${relativePath}`)
@@ -83,7 +65,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
       const normalizedDir = this.normalizePath(relativePath)
       const fileNames = new Set<string>()
 
-      for (const filePath of Object.keys(this.data)) {
+      for (const filePath of this.store.keys()) {
         if (this.isFileInDirectory(filePath, normalizedDir)) {
           const relativePart = this.getRelativePartFromDirectory(filePath, normalizedDir)
           const segments = relativePart.split("/").filter(Boolean)
@@ -128,7 +110,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
       const normalizedPath = this.normalizePath(relativePath)
 
       // Check if any file starts with this path + "/"
-      for (const filePath of Object.keys(this.data)) {
+      for (const filePath of this.store.keys()) {
         if (filePath.startsWith(`${normalizedPath}/`)) {
           return true
         }
@@ -146,7 +128,7 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
   async isFile(relativePath: string): Promise<boolean> {
     try {
       const normalizedPath = this.normalizePath(relativePath)
-      return normalizedPath in this.data
+      return this.store.has(normalizedPath)
     } catch {
       return false
     }
@@ -232,14 +214,14 @@ export class DocFileSystemJsonRead implements DocFileSystemReadInterface {
    * Get all file paths in the JSON data
    */
   getAllFilePaths(): string[] {
-    return Object.keys(this.data)
+    return this.store.keys()
   }
 
   /**
    * Get the raw JSON data
    */
-  getRawData(): JsonDocumentData {
-    return { ...this.data }
+  getRawData() {
+    return this.store.toData()
   }
 
   /**

@@ -33,5 +33,7 @@ export class DocFileSystemNode extends DocFileSystem {
       reader,
       writer,
     })
+
+    Object.freeze(this)
   }
 }
